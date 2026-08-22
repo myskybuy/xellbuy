@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "name": "Skincare",
+    "image": "https://placehold.co/800x500/b3355a/fdf6f6?text=Skincare&font=montserrat"
+  },
+  {
+    "id": 2,
+    "name": "Haircare",
+    "image": "https://placehold.co/800x500/7d1f3f/fdf6f6?text=Haircare&font=montserrat"
+  },
+  {
+    "id": 3,
+    "name": "Bath & Body",
+    "image": "https://placehold.co/800x500/d9a441/2b1420?text=Bath+%26+Body&font=montserrat"
+  },
+  {
+    "id": 4,
+    "name": "Makeup",
+    "image": "https://placehold.co/800x500/c72c48/fdf6f6?text=Makeup&font=montserrat"
+  },
+  {
+    "id": 5,
+    "name": "Fragrance",
+    "image": "https://placehold.co/800x500/8a4a63/fdf6f6?text=Fragrance&font=montserrat"
+  }
+]
