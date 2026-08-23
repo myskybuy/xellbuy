@@ -56,7 +56,7 @@ export default function AuthModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (data.success && data.otpRequired) {
         setOtpEmail(data.email || loginEmail.trim().toLowerCase());
         setStep("otp");
@@ -89,7 +89,7 @@ export default function AuthModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: otpEmail, code: otp }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (data.success && data.user) {
         setUser(data.user);
         toast.success(`Welcome back, ${data.user.name.split(" ")[0]}!`);
@@ -117,7 +117,7 @@ export default function AuthModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: otpEmail }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (data.success) {
         if (data.emailSent === false && data.warning) {
           setNotice(data.warning);
@@ -148,7 +148,7 @@ export default function AuthModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: signupName, email: signupEmail, password: signupPassword }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (data.success && data.user) {
         setUser(data.user);
         toast.success("Account created — you're logged in");

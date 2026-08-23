@@ -13,14 +13,14 @@ export async function createLoginOtp(email: string) {
   const cleanEmail = email.trim().toLowerCase();
   const code = generateOtpCode();
   const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60 * 1000);
-  const now = new Date();
 
-  // Atomic upsert avoids deleteMany+create race (live double-submit).
-  await prisma.loginOtp.upsert({
-    where: { email: cleanEmail },
-    create: { email: cleanEmail, code, expiresAt, attempts: 0, createdAt: now },
-    update: { code, expiresAt, attempts: 0, createdAt: now },
-  });
+  // deleteMany + create works without requiring email @unique on the Prisma client.
+  await prisma.$transaction([
+    prisma.loginOtp.deleteMany({ where: { email: cleanEmail } }),
+    prisma.loginOtp.create({
+      data: { email: cleanEmail, code, expiresAt, attempts: 0 },
+    }),
+  ]);
 
   return code;
 }
@@ -33,7 +33,10 @@ export async function verifyLoginOtp(email: string, code: string) {
     return { ok: false, error: "Email and 6-digit OTP are required." };
   }
 
-  const otp = await prisma.loginOtp.findUnique({ where: { email: cleanEmail } });
+  const otp = await prisma.loginOtp.findFirst({
+    where: { email: cleanEmail },
+    orderBy: { createdAt: "desc" },
+  });
 
   if (!otp) {
     return { ok: false, error: "No OTP found. Please request a new one." };
