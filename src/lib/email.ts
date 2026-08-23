@@ -23,6 +23,10 @@ type OrderEmail = {
   paymentMethod: string;
 };
 
+export type OtpEmailResult =
+  | { sent: true }
+  | { sent: false; error: string; codeForDev?: string };
+
 export async function sendOrderConfirmationEmail(order: OrderEmail) {
   if (!order.email) return;
 
@@ -54,28 +58,45 @@ export async function sendOrderConfirmationEmail(order: OrderEmail) {
   });
 }
 
-export async function sendLoginOtpEmail(to: string, code: string) {
-  if (!to) return;
+export async function sendLoginOtpEmail(to: string, code: string): Promise<OtpEmailResult> {
+  if (!to) return { sent: false, error: "Email address is missing." };
 
   if (!transporter) {
-    // EMAIL_ENABLED is off (e.g. local dev) — log the OTP so login can still be tested.
     console.log(`[xellbuy] EMAIL_ENABLED is false — login OTP for ${to} is: ${code}`);
-    return;
+    const isProd = process.env.NODE_ENV === "production";
+    if (isProd) {
+      return {
+        sent: false,
+        error: "Email is not configured. Set EMAIL_ENABLED=true with EMAIL_USER and EMAIL_APP_PASSWORD.",
+      };
+    }
+    // Dev: allow testing with console OTP, but be honest with the client.
+    return {
+      sent: false,
+      error: "Email delivery is off (EMAIL_ENABLED). Check the server console for your OTP.",
+      codeForDev: code,
+    };
   }
 
-  await transporter.sendMail({
-    from: `"Xellbuy" <${EMAIL_USER}>`,
-    to,
-    subject: `${code} is your Xellbuy login OTP`,
-    html: `
-      <div style="font-family:Inter,Arial,sans-serif;max-width:480px;margin:0 auto;">
-        <h2 style="color:#b3355a;">Verify it's you</h2>
-        <p>Use the OTP below to log in to your Xellbuy account.</p>
-        <p style="font-size:32px;font-weight:800;letter-spacing:6px;margin:20px 0;">${code}</p>
-        <p style="color:#7a6169;font-size:13px;">This OTP is valid for 10 minutes. Don't share it with anyone.</p>
-      </div>
-    `,
-  });
+  try {
+    await transporter.sendMail({
+      from: `"Xellbuy" <${EMAIL_USER}>`,
+      to,
+      subject: `${code} is your Xellbuy login OTP`,
+      html: `
+        <div style="font-family:Inter,Arial,sans-serif;max-width:480px;margin:0 auto;">
+          <h2 style="color:#b3355a;">Verify it's you</h2>
+          <p>Use the OTP below to log in to your Xellbuy account.</p>
+          <p style="font-size:32px;font-weight:800;letter-spacing:6px;margin:20px 0;">${code}</p>
+          <p style="color:#7a6169;font-size:13px;">This OTP is valid for 10 minutes. Don't share it with anyone.</p>
+        </div>
+      `,
+    });
+    return { sent: true };
+  } catch (err) {
+    console.error("[xellbuy] Failed to send login OTP email:", err);
+    return { sent: false, error: "Could not send OTP email. Please try again in a moment." };
+  }
 }
 
 export async function sendWelcomeEmail(user: { name: string; email: string }) {

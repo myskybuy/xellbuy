@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useCart } from "./CartProvider";
 
 export type Product = {
@@ -36,6 +37,7 @@ export default function ProductCard({ product }: { product: Product }) {
       salePrice: product.salePrice,
     });
     setFeedback("added");
+    toast.success("Added to cart");
   }
 
   const btnLabel =

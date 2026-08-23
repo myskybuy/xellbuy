@@ -1,15 +1,15 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-
-type User = { id: number; name: string; email: string };
+import { toast } from "sonner";
+import { useAuth, type AuthUser } from "./AuthProvider";
 
 type AuthModalProps = {
   open: boolean;
   title?: string;
   message?: string;
   onClose?: () => void;
-  onSuccess: (user: User) => void;
+  onSuccess: (user: AuthUser) => void;
 };
 
 export default function AuthModal({
@@ -19,6 +19,7 @@ export default function AuthModal({
   onClose,
   onSuccess,
 }: AuthModalProps) {
+  const { setUser } = useAuth();
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [step, setStep] = useState<"form" | "otp">("form");
   const [loginEmail, setLoginEmail] = useState("");
@@ -55,9 +56,17 @@ export default function AuthModal({
       if (data.success && data.otpRequired) {
         setOtpEmail(data.email || loginEmail);
         setStep("otp");
-        setNotice(`We've sent a 6-digit OTP to ${data.email || loginEmail}. Enter it below to log in.`);
+        if (data.emailSent === false && data.warning) {
+          setNotice(data.warning);
+          toast.warning(data.warning);
+        } else {
+          setNotice(`We've sent a 6-digit OTP to ${data.email || loginEmail}. Enter it below to log in.`);
+          toast.success("OTP sent to your email");
+        }
       } else {
-        setError(data.error || "Login failed");
+        const msg = data.error || "Login failed";
+        setError(msg);
+        toast.error(msg);
       }
     } finally {
       setLoading(false);
@@ -76,10 +85,14 @@ export default function AuthModal({
       });
       const data = await res.json();
       if (data.success && data.user) {
+        setUser(data.user);
+        toast.success(`Welcome back, ${data.user.name.split(" ")[0]}!`);
         onSuccess(data.user);
         resetToForm();
       } else {
-        setError(data.error || "Invalid OTP");
+        const msg = data.error || "Invalid OTP";
+        setError(msg);
+        toast.error(msg);
       }
     } finally {
       setLoading(false);
@@ -97,8 +110,19 @@ export default function AuthModal({
         body: JSON.stringify({ email: otpEmail }),
       });
       const data = await res.json();
-      if (data.success) setNotice(`A new OTP has been sent to ${otpEmail}.`);
-      else setError(data.error || "Could not resend OTP");
+      if (data.success) {
+        if (data.emailSent === false && data.warning) {
+          setNotice(data.warning);
+          toast.warning(data.warning);
+        } else {
+          setNotice(`A new OTP has been sent to ${otpEmail}.`);
+          toast.success("OTP resent");
+        }
+      } else {
+        const msg = data.error || "Could not resend OTP";
+        setError(msg);
+        toast.error(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -115,8 +139,15 @@ export default function AuthModal({
         body: JSON.stringify({ name: signupName, email: signupEmail, password: signupPassword }),
       });
       const data = await res.json();
-      if (data.success && data.user) onSuccess(data.user);
-      else setError(data.error || "Sign up failed");
+      if (data.success && data.user) {
+        setUser(data.user);
+        toast.success("Account created — you're logged in");
+        onSuccess(data.user);
+      } else {
+        const msg = data.error || "Sign up failed";
+        setError(msg);
+        toast.error(msg);
+      }
     } finally {
       setLoading(false);
     }

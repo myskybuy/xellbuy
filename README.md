@@ -34,8 +34,14 @@ npm run dev
 
 - `DATABASE_URL` — PostgreSQL connection
 - `SESSION_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD`
-- `EMAIL_*` — order emails (optional)
+- `EMAIL_ENABLED=true` — required for login OTP + order emails to actually send
+- `EMAIL_USER` — Gmail address used as From
+- `EMAIL_APP_PASSWORD` — Gmail App Password (not your normal password)
 - `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `NEXT_PUBLIC_RAZORPAY_KEY_ID` — online pay (optional)
+
+### Login OTP email
+
+Login sends a 6-digit OTP **only after** password verification. If `EMAIL_ENABLED` is not `true` (or credentials are missing), production returns an error; local/dev logs the OTP in the server console and shows a warning toast instead of pretending the mail was sent.
 
 ## Features
 

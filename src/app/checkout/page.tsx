@@ -4,10 +4,12 @@ import Link from "next/link";
 import Script from "next/script";
 import { useEffect, useState } from "react";
 import AuthModal from "@/components/AuthModal";
+import { useAuth } from "@/components/AuthProvider";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import StoreShell from "@/components/StoreShell";
 import { useCart } from "@/components/CartProvider";
+import { toast } from "sonner";
 
 declare global {
   interface Window {
@@ -15,12 +17,9 @@ declare global {
   }
 }
 
-type User = { id: number; name: string; email: string };
-
 export default function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart();
-  const [user, setUser] = useState<User | null>(null);
-  const [authChecked, setAuthChecked] = useState(false);
+  const { user, setUser, loading: authLoading } = useAuth();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -34,22 +33,16 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "RAZORPAY">("COD");
 
   useEffect(() => {
-    fetch("/api/auth/me")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.user) {
-          setUser(d.user);
-          setName(d.user.name || "");
-          setEmail(d.user.email || "");
-        }
-      })
-      .finally(() => setAuthChecked(true));
+    if (user) {
+      setName((n) => n || user.name || "");
+      setEmail((e) => e || user.email || "");
+    }
     setRazorpayEnabled(!!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID);
-  }, []);
+  }, [user]);
 
   const subtotal = cartTotal;
   const total = Math.max(0, subtotal - discount);
-  const showAuthModal = authChecked && !user;
+  const showAuthModal = !authLoading && !user;
 
   async function applyCoupon() {
     setCouponMsg("");
@@ -62,20 +55,31 @@ export default function CheckoutPage() {
     if (data.success) {
       setDiscount(data.discount);
       setAppliedCode(data.code);
-      setCouponMsg(`Coupon applied: -₹${data.discount}`);
+      const msg = `Coupon applied: -₹${data.discount}`;
+      setCouponMsg(msg);
+      toast.success(msg);
     } else {
       setDiscount(0);
       setAppliedCode("");
-      setCouponMsg(data.error || "Invalid coupon");
+      const msg = data.error || "Invalid coupon";
+      setCouponMsg(msg);
+      toast.error(msg);
     }
   }
 
   async function placeOrder() {
     if (!user) return;
-    if (!cart.length) return alert("Cart is empty");
-    if (!name || !phone || !address) return alert("Please fill all required fields");
+    if (!cart.length) {
+      toast.error("Cart is empty");
+      return;
+    }
+    if (!name || !phone || !address) {
+      toast.error("Please fill all required fields");
+      return;
+    }
     if (paymentMethod === "RAZORPAY" && !razorpayEnabled) {
-      return alert("Online payment is not configured yet. Choose Cash on Delivery or contact support.");
+      toast.error("Online payment is not configured yet. Choose Cash on Delivery or contact support.");
+      return;
     }
 
     const payload = {
@@ -95,7 +99,10 @@ export default function CheckoutPage() {
       body: JSON.stringify(payload),
     });
     const data = await res.json();
-    if (!res.ok) return alert(data.error || "Order failed");
+    if (!res.ok) {
+      toast.error(data.error || "Order failed");
+      return;
+    }
 
     if (paymentMethod === "RAZORPAY" && data.razorpayOrderId && data.key) {
       const rzp = new window.Razorpay({
@@ -120,12 +127,13 @@ export default function CheckoutPage() {
           if (verify.ok) {
             clearCart();
             setSuccessId(verifyData.orderId);
+            toast.success("Payment successful — order placed");
           } else {
-            alert(verifyData.error || "Payment verification failed");
+            toast.error(verifyData.error || "Payment verification failed");
           }
         },
         prefill: { name, email, contact: phone },
-        theme: { color: "#0d5c53" },
+        theme: { color: "#9c2d4a" },
       });
       rzp.open();
       return;
@@ -133,6 +141,7 @@ export default function CheckoutPage() {
 
     clearCart();
     setSuccessId(data.orderId);
+    toast.success("Order placed successfully");
   }
 
   if (successId) {
@@ -258,7 +267,7 @@ export default function CheckoutPage() {
               {paymentMethod === "RAZORPAY" ? "Pay & place order" : "Place order (COD)"}
             </button>
           </>
-        ) : authChecked ? (
+        ) : !authLoading ? (
           <p style={{ color: "var(--color-muted)" }}>Complete login in the popup above to continue checkout.</p>
         ) : (
           <p>Loading…</p>

@@ -39,9 +39,6 @@ export default function SiteFooter() {
             <a href={`tel:${COMPANY.phone.replace(/\s/g, "")}`}>{COMPANY.phone}</a>
           </p>
           <p>
-            <a href="tel:+919213558031">+91 92135-58031</a>
-          </p>
-          <p>
             <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
           </p>
         </div>

@@ -2,36 +2,36 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
+import { useAuth } from "./AuthProvider";
 import { useCart } from "./CartProvider";
-
-type User = { id: number; name: string; email: string };
 
 export default function SiteHeader({ showSearch = true }: { showSearch?: boolean }) {
   const router = useRouter();
   const { cartCount } = useCart();
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const [query, setQuery] = useState("");
-
-  useEffect(() => {
-    fetch("/api/auth/me")
-      .then((r) => r.json())
-      .then((d) => setUser(d.user))
-      .catch(() => setUser(null));
-  }, []);
+  const [navOpen, setNavOpen] = useState(false);
 
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
-    if (query.trim()) router.push(`/shop?q=${encodeURIComponent(query.trim())}`);
+    if (query.trim()) {
+      setNavOpen(false);
+      router.push(`/shop?q=${encodeURIComponent(query.trim())}`);
+    }
   };
 
   return (
     <header className="site-header">
       <div className="header-inner">
-        <Link href="/" className="logo">
-          <span className="logo-my">XELL</span>
-          <span className="logo-skybuy">BUY</span>
+        <Link href="/" className="logo" onClick={() => setNavOpen(false)}>
+          <span className="logo-mark">X</span>
+          <span className="logo-word">
+            <span className="logo-my">XELL</span>
+            <span className="logo-skybuy">BUY</span>
+          </span>
         </Link>
+
         {showSearch ? (
           <form onSubmit={onSearch} className="search-wrap">
             <span className="search-icon" aria-hidden>
@@ -49,15 +49,43 @@ export default function SiteHeader({ showSearch = true }: { showSearch?: boolean
             />
           </form>
         ) : null}
-        <nav className="main-nav">
-          <Link href="/shop?category=Skincare">Skincare</Link>
-          <Link href="/shop?category=Haircare">Haircare</Link>
-          <Link href="/shop?category=Makeup">Makeup</Link>
-          <Link href="/shop?category=Bath%20%26%20Body">Bath &amp; Body</Link>
-          <Link href="/shop?category=Fragrance">Fragrance</Link>
-          <Link href="/shop?sale=1">Price Drops</Link>
-          <Link href="/about">About Us</Link>
+
+        <button
+          type="button"
+          className={`nav-toggle ${navOpen ? "open" : ""}`}
+          aria-label={navOpen ? "Close menu" : "Open menu"}
+          aria-expanded={navOpen}
+          onClick={() => setNavOpen((v) => !v)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        <nav className={`main-nav ${navOpen ? "open" : ""}`}>
+          <Link href="/shop?category=Skincare" onClick={() => setNavOpen(false)}>
+            Skincare
+          </Link>
+          <Link href="/shop?category=Haircare" onClick={() => setNavOpen(false)}>
+            Haircare
+          </Link>
+          <Link href="/shop?category=Makeup" onClick={() => setNavOpen(false)}>
+            Makeup
+          </Link>
+          <Link href="/shop?category=Bath%20%26%20Body" onClick={() => setNavOpen(false)}>
+            Bath &amp; Body
+          </Link>
+          <Link href="/shop?category=Fragrance" onClick={() => setNavOpen(false)}>
+            Fragrance
+          </Link>
+          <Link href="/shop?sale=1" onClick={() => setNavOpen(false)}>
+            Price Drops
+          </Link>
+          <Link href="/about" onClick={() => setNavOpen(false)}>
+            About Us
+          </Link>
         </nav>
+
         <div className="header-actions">
           <Link href={user ? "/profile" : "/account"} className="profile-link" title={user ? "My profile" : "Login / Sign up"}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -67,7 +95,7 @@ export default function SiteHeader({ showSearch = true }: { showSearch?: boolean
             <span className="profile-label">{user ? user.name.split(" ")[0] : "Account"}</span>
           </Link>
           <Link href="/cart" className="cart-pill">
-            My Cart ({cartCount})
+            Cart ({cartCount})
           </Link>
         </div>
       </div>

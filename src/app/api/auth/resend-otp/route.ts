@@ -15,11 +15,22 @@ export async function POST(req: NextRequest) {
   const user = await prisma.user.findUnique({ where: { email: cleanEmail } });
   if (!user) {
     // Don't reveal whether the account exists.
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, emailSent: true });
   }
 
   const code = await createLoginOtp(cleanEmail);
-  await sendLoginOtpEmail(cleanEmail, code);
+  const mail = await sendLoginOtpEmail(cleanEmail, code);
 
-  return NextResponse.json({ success: true });
+  if (!mail.sent) {
+    if (mail.codeForDev) {
+      return NextResponse.json({
+        success: true,
+        emailSent: false,
+        warning: mail.error,
+      });
+    }
+    return NextResponse.json({ error: mail.error }, { status: 503 });
+  }
+
+  return NextResponse.json({ success: true, emailSent: true });
 }

@@ -1,0 +1,14 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="720" height="900" viewBox="0 0 720 900" fill="none">
+  <defs>
+    <linearGradient id="aboutWhoBg" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7d1f3f"/>
+      <stop offset="100%" stop-color="#1f0f16"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="900" fill="url(#aboutWhoBg)"/>
+  <rect x="110" y="160" width="220" height="300" rx="28" fill="#fdf6f6" opacity="0.12"/>
+  <rect x="390" y="240" width="220" height="300" rx="28" fill="#c4922e" opacity="0.22"/>
+  <circle cx="360" cy="620" r="90" fill="#ffffff" opacity="0.08"/>
+  <text x="360" y="760" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="36" font-weight="700" fill="#fdf6f6">Everyday beauty,</text>
+  <text x="360" y="810" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="36" font-weight="700" fill="#f0dde2">curated.</text>
+</svg>

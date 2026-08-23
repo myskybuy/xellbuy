@@ -8,6 +8,7 @@ import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import StoreShell from "@/components/StoreShell";
 import { useCart } from "@/components/CartProvider";
+import { toast } from "sonner";
 
 export default function ProductPage() {
   const params = useParams();
@@ -73,6 +74,7 @@ export default function ProductPage() {
                 qty
               );
               setFeedback("added");
+              toast.success(qty > 1 ? `Added ${qty} items to cart` : "Added to cart");
             }}
           >
             {btnLabel}

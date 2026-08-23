@@ -3,7 +3,7 @@ export const COMPANY = {
   brand: "Xellbuy",
   address:
     "4th Floor, Building/Flat No. 435, A.R. Mall, Opp. Panvel Point, Mota Varachha, Surat, Gujarat – 394101",
-  phone: "+91 92136-23743",
+  phone: "+91 92135-58031",
   email: "hello@xellbuy.com",
   website: "https://xellbuy.com",
 };

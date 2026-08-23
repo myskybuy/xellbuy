@@ -4,8 +4,8 @@ import SiteHeader from "@/components/SiteHeader";
 import StoreShell from "@/components/StoreShell";
 import { COMPANY } from "@/lib/policies";
 
-const HERO_IMG = "https://placehold.co/900x700/b3355a/fdf6f6?text=Xellbuy&font=montserrat";
-const WHO_IMG = "https://placehold.co/900x700/7d1f3f/fdf6f6?text=Beauty+Edit&font=montserrat";
+const HERO_IMG = "/images/about/hero.svg";
+const WHO_IMG = "/images/about/who.svg";
 
 const offers = [
   {

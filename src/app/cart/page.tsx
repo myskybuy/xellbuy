@@ -1,26 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import AuthModal from "@/components/AuthModal";
+import { useAuth } from "@/components/AuthProvider";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import StoreShell from "@/components/StoreShell";
 import { useCart } from "@/components/CartProvider";
-
-type User = { id: number; name: string; email: string };
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQty, cartTotal } = useCart();
-  const [user, setUser] = useState<User | null>(null);
+  const { user, setUser } = useAuth();
   const [showAuth, setShowAuth] = useState(false);
-
-  useEffect(() => {
-    fetch("/api/auth/me")
-      .then((r) => r.json())
-      .then((d) => setUser(d.user))
-      .catch(() => setUser(null));
-  }, []);
 
   function goCheckout(e: React.MouseEvent) {
     if (!user) {
@@ -40,6 +33,7 @@ export default function CartPage() {
         onSuccess={(u) => {
           setUser(u);
           setShowAuth(false);
+          toast.success("Logged in — continuing to checkout");
           window.location.href = "/checkout";
         }}
       />
@@ -58,14 +52,25 @@ export default function CartPage() {
                   <strong>{item.name}</strong>
                   <div>₹{item.salePrice}</div>
                   <div className="qty-controls">
-                    <button type="button" onClick={() => updateQty(item.id, item.qty - 1)}>-</button>
+                    <button type="button" onClick={() => updateQty(item.id, item.qty - 1)}>
+                      -
+                    </button>
                     <span>{item.qty}</span>
-                    <button type="button" onClick={() => updateQty(item.id, item.qty + 1)}>+</button>
+                    <button type="button" onClick={() => updateQty(item.id, item.qty + 1)}>
+                      +
+                    </button>
                   </div>
                 </div>
                 <div>
                   <div style={{ fontWeight: 700 }}>₹{item.salePrice * item.qty}</div>
-                  <button type="button" className="remove-btn" onClick={() => removeFromCart(item.id)}>
+                  <button
+                    type="button"
+                    className="remove-btn"
+                    onClick={() => {
+                      removeFromCart(item.id);
+                      toast.success("Removed from cart");
+                    }}
+                  >
                     Remove
                   </button>
                 </div>

@@ -21,7 +21,21 @@ export async function POST(req: NextRequest) {
   }
 
   const code = await createLoginOtp(cleanEmail);
-  await sendLoginOtpEmail(cleanEmail, code);
+  const mail = await sendLoginOtpEmail(cleanEmail, code);
 
-  return NextResponse.json({ success: true, otpRequired: true, email: cleanEmail });
+  if (!mail.sent) {
+    // OTP is stored; in non-prod we still advance to OTP step so login can be tested via console.
+    if (mail.codeForDev) {
+      return NextResponse.json({
+        success: true,
+        otpRequired: true,
+        email: cleanEmail,
+        emailSent: false,
+        warning: mail.error,
+      });
+    }
+    return NextResponse.json({ error: mail.error }, { status: 503 });
+  }
+
+  return NextResponse.json({ success: true, otpRequired: true, email: cleanEmail, emailSent: true });
 }

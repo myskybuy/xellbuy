@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import StoreShell from "@/components/StoreShell";
+import { useAuth } from "@/components/AuthProvider";
 
-type User = { id: number; name: string; email: string };
 type Order = { id: number; total: number; status: string; createdAt: string; items: unknown[] };
 
 export default function AccountPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, setUser, clearUser, refreshUser } = useAuth();
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [step, setStep] = useState<"form" | "otp">("form");
   const [loginEmail, setLoginEmail] = useState("");
@@ -26,18 +27,15 @@ export default function AccountPage() {
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
 
-  async function loadAccount() {
-    const me = await fetch("/api/auth/me").then((r) => r.json());
-    setUser(me.user);
-    if (me.user) {
-      const data = await fetch("/api/account/orders").then((r) => r.json());
-      setOrders(Array.isArray(data) ? data : []);
-    }
+  async function loadOrders() {
+    const data = await fetch("/api/account/orders").then((r) => r.json());
+    setOrders(Array.isArray(data) ? data : []);
   }
 
   useEffect(() => {
-    loadAccount();
-  }, []);
+    if (user) loadOrders();
+    else setOrders([]);
+  }, [user]);
 
   async function doLogin() {
     setLoginError("");
@@ -51,10 +49,18 @@ export default function AccountPage() {
       const data = await res.json();
       if (data.success && data.otpRequired) {
         setOtpEmail(data.email || loginEmail);
-        setOtpNotice(`We've sent a 6-digit OTP to ${data.email || loginEmail}. Enter it below to log in.`);
+        if (data.emailSent === false && data.warning) {
+          setOtpNotice(data.warning);
+          toast.warning(data.warning);
+        } else {
+          setOtpNotice(`We've sent a 6-digit OTP to ${data.email || loginEmail}. Enter it below to log in.`);
+          toast.success("OTP sent to your email");
+        }
         setStep("otp");
       } else {
-        setLoginError(data.error || "Login failed");
+        const msg = data.error || "Login failed";
+        setLoginError(msg);
+        toast.error(msg);
       }
     } finally {
       setLoading(false);
@@ -74,9 +80,13 @@ export default function AccountPage() {
       if (data.success) {
         setStep("form");
         setOtp("");
-        loadAccount();
+        if (data.user) setUser(data.user);
+        else await refreshUser();
+        toast.success("Logged in successfully");
       } else {
-        setLoginError(data.error || "Invalid OTP");
+        const msg = data.error || "Invalid OTP";
+        setLoginError(msg);
+        toast.error(msg);
       }
     } finally {
       setLoading(false);
@@ -93,8 +103,19 @@ export default function AccountPage() {
         body: JSON.stringify({ email: otpEmail }),
       });
       const data = await res.json();
-      if (data.success) setOtpNotice(`A new OTP has been sent to ${otpEmail}.`);
-      else setLoginError(data.error || "Could not resend OTP");
+      if (data.success) {
+        if (data.emailSent === false && data.warning) {
+          setOtpNotice(data.warning);
+          toast.warning(data.warning);
+        } else {
+          setOtpNotice(`A new OTP has been sent to ${otpEmail}.`);
+          toast.success("OTP resent");
+        }
+      } else {
+        const msg = data.error || "Could not resend OTP";
+        setLoginError(msg);
+        toast.error(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -102,20 +123,32 @@ export default function AccountPage() {
 
   async function doSignup() {
     setSignupError("");
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: signupName, email: signupEmail, password: signupPassword }),
-    });
-    const data = await res.json();
-    if (data.success) loadAccount();
-    else setSignupError(data.error || "Sign up failed");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: signupName, email: signupEmail, password: signupPassword }),
+      });
+      const data = await res.json();
+      if (data.success && data.user) {
+        setUser(data.user);
+        toast.success("Account created — you're logged in");
+      } else {
+        const msg = data.error || "Sign up failed";
+        setSignupError(msg);
+        toast.error(msg);
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function doLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
+    clearUser();
     setOrders([]);
-    loadAccount();
+    toast.success("Logged out");
   }
 
   if (user) {
@@ -167,7 +200,9 @@ export default function AccountPage() {
 
         {step === "otp" ? (
           <div>
-            <p className="account-note" style={{ marginBottom: 16 }}>{otpNotice}</p>
+            <p className="account-note" style={{ marginBottom: 16 }}>
+              {otpNotice}
+            </p>
             <div className="form-group">
               <label>Enter OTP</label>
               <input
@@ -191,7 +226,15 @@ export default function AccountPage() {
               </button>
             </p>
             <p className="account-note">
-              <button type="button" className="auth-modal-link" onClick={() => { setStep("form"); setOtp(""); setLoginError(""); }}>
+              <button
+                type="button"
+                className="auth-modal-link"
+                onClick={() => {
+                  setStep("form");
+                  setOtp("");
+                  setLoginError("");
+                }}
+              >
                 ← Back to login
               </button>
             </p>
@@ -237,8 +280,8 @@ export default function AccountPage() {
                   <label>Password</label>
                   <input type="password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} placeholder="At least 6 characters" />
                 </div>
-                <button className="btn btn-accent" style={{ width: "100%" }} onClick={doSignup}>
-                  Create account
+                <button className="btn btn-accent" style={{ width: "100%" }} onClick={doSignup} disabled={loading}>
+                  {loading ? "Please wait…" : "Create account"}
                 </button>
                 {signupError ? <p className="account-error">{signupError}</p> : null}
               </div>
