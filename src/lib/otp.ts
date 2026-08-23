@@ -57,18 +57,23 @@ export async function issueOtp(email: string, purpose: OtpPurpose) {
   return { ok: true as const };
 }
 
-export async function consumeOtp(email: string, purpose: OtpPurpose, code: string) {
+export type ConsumeOtpResult =
+  | { ok: true }
+  | { ok: false; reason: "bad_format" | "not_found" | "expired" | "mismatch" };
+
+export async function consumeOtp(email: string, purpose: OtpPurpose, code: string): Promise<ConsumeOtpResult> {
   const cleanEmail = email.trim().toLowerCase();
   const cleanCode = String(code).replace(/\D/g, "").trim();
-  if (!cleanEmail || cleanCode.length !== 6) return false;
+  if (!cleanEmail || cleanCode.length !== 6) return { ok: false, reason: "bad_format" };
 
   const row = await prisma.otpCode.findFirst({
     where: { email: cleanEmail, purpose },
     orderBy: { createdAt: "desc" },
   });
-  if (!row || row.expiresAt.getTime() < Date.now() || !hashesEqual(row.codeHash, hashOtp(cleanCode))) {
-    return false;
-  }
+  if (!row) return { ok: false, reason: "not_found" };
+  if (row.expiresAt.getTime() < Date.now()) return { ok: false, reason: "expired" };
+  if (!hashesEqual(row.codeHash, hashOtp(cleanCode))) return { ok: false, reason: "mismatch" };
+
   await prisma.otpCode.deleteMany({ where: { email: cleanEmail, purpose } });
-  return true;
+  return { ok: true };
 }

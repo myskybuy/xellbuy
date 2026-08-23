@@ -4,19 +4,27 @@ import { consumeOtp, type OtpPurpose } from "@/lib/otp";
 import { publicUser } from "@/lib/password";
 import { getSession } from "@/lib/session";
 
+const CONSUME_ERRORS: Record<"bad_format" | "not_found" | "expired" | "mismatch", string> = {
+  bad_format: "Enter the 6-digit OTP from your email",
+  not_found: "No OTP found. Please log in again to get a new code",
+  expired: "OTP expired. Please request a new code",
+  mismatch: "Incorrect OTP. Check the latest email and try again",
+};
+
 export async function POST(req: NextRequest) {
   try {
     const { email, purpose, code } = await req.json();
     const cleanEmail = (email || "").trim().toLowerCase();
-    const otpPurpose: OtpPurpose | "" = purpose === "signup" || purpose === "login" ? purpose : "login";
+    const otpPurpose: OtpPurpose = purpose === "signup" || purpose === "login" ? purpose : "login";
 
     if (!cleanEmail || !code) {
       return NextResponse.json({ error: "Email and OTP are required" }, { status: 400 });
     }
 
-    const ok = await consumeOtp(cleanEmail, otpPurpose || "login", String(code));
-    if (!ok) {
-      return NextResponse.json({ error: "Invalid or expired code" }, { status: 400 });
+    const result = await consumeOtp(cleanEmail, otpPurpose, String(code));
+    if (!result.ok) {
+      console.warn("[auth/verify-otp]", result.reason, cleanEmail);
+      return NextResponse.json({ error: CONSUME_ERRORS[result.reason], reason: result.reason }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({ where: { email: cleanEmail } });
