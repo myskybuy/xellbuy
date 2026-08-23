@@ -40,6 +40,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, user: publicUser(user) });
   } catch (err) {
     console.error("[auth/verify-otp]", err);
+    const msg = err instanceof Error ? err.message : String(err);
+    if (/otpcode|otp_code|does not exist|unknown arg/i.test(msg)) {
+      return NextResponse.json(
+        {
+          error: "OTP database table is missing. On the server run: npx prisma db push && npm run build && pm2 reload",
+          reason: "db_schema",
+        },
+        { status: 503 },
+      );
+    }
     return NextResponse.json({ error: "OTP verification failed. Please try again." }, { status: 500 });
   }
 }

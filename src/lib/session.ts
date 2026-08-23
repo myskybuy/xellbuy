@@ -20,6 +20,7 @@ export const sessionOptions: SessionOptions = {
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
+    ...(process.env.COOKIE_DOMAIN ? { domain: process.env.COOKIE_DOMAIN } : {}),
   },
 };
 

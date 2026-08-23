@@ -26,9 +26,18 @@ export async function issueOtp(email: string, purpose: OtpPurpose) {
     where: { email: cleanEmail, purpose },
     orderBy: { createdAt: "desc" },
   });
-  if (recent && Date.now() - recent.createdAt.getTime() < RESEND_MS) {
-    const wait = Math.ceil((RESEND_MS - (Date.now() - recent.createdAt.getTime())) / 1000);
-    return { ok: false as const, error: `Please wait ${wait}s before requesting another code`, status: 429 };
+
+  // Reuse unexpired OTP inside resend window (avoid 429 + "old email code" confusion).
+  if (
+    recent &&
+    recent.expiresAt.getTime() > Date.now() &&
+    Date.now() - recent.createdAt.getTime() < RESEND_MS
+  ) {
+    return {
+      ok: true as const,
+      reused: true,
+      warning: "Use the OTP already sent to your email (or wait 60s to resend).",
+    };
   }
 
   await prisma.otpCode.deleteMany({ where: { email: cleanEmail, purpose } });
@@ -45,13 +54,15 @@ export async function issueOtp(email: string, purpose: OtpPurpose) {
   const mail = await sendLoginOtpEmail(cleanEmail, code);
   if (!mail.sent) {
     if (mail.codeForDev) {
-      // Local/dev: OTP logged to console — allow login flow to continue.
       return { ok: true as const, codeForDev: mail.codeForDev, warning: mail.error };
     }
-    if (process.env.NODE_ENV === "production") {
-      return { ok: false as const, error: mail.error || "Could not send verification email. Please try again.", status: 503 };
-    }
-    return { ok: false as const, error: mail.error || "Could not send verification email.", status: 503 };
+    // Don't leave an unverifiable OTP row if email failed.
+    await prisma.otpCode.deleteMany({ where: { email: cleanEmail, purpose } });
+    return {
+      ok: false as const,
+      error: mail.error || "Could not send verification email. Please try again.",
+      status: 503,
+    };
   }
 
   return { ok: true as const };

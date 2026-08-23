@@ -31,8 +31,9 @@ export async function POST(req: NextRequest) {
       needsOtp: true,
       email: cleanEmail,
       purpose: "login",
-      emailSent: !otp.warning,
+      emailSent: !otp.warning && !("reused" in otp && otp.reused),
       warning: otp.warning,
+      reused: "reused" in otp ? otp.reused : false,
     });
   } catch (err) {
     console.error("[auth/login]", err);
