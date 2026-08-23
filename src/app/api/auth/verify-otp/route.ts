@@ -5,9 +5,11 @@ import { verifyLoginOtp } from "@/lib/otp";
 import { getSession } from "@/lib/session";
 
 export async function POST(req: NextRequest) {
-  const { email, code } = await req.json();
-  const cleanEmail = (email || "").trim().toLowerCase();
-  const cleanCode = (code || "").toString().trim();
+  const body = await req.json();
+  const session = await getSession();
+
+  const cleanEmail = ((body.email || session.pendingOtpEmail || "") as string).trim().toLowerCase();
+  const cleanCode = (body.code || "").toString().replace(/\D/g, "").trim();
 
   if (!cleanEmail || !cleanCode) {
     return NextResponse.json({ error: "Email and OTP are required" }, { status: 400 });
@@ -23,8 +25,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Account not found" }, { status: 404 });
   }
 
-  const session = await getSession();
   session.userId = user.id;
+  session.pendingOtpEmail = undefined;
   await session.save();
 
   return NextResponse.json({ success: true, user: publicUser(user) });

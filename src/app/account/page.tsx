@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
@@ -12,7 +11,6 @@ import { useAuth } from "@/components/AuthProvider";
 type Order = { id: number; total: number; status: string; createdAt: string; items: unknown[] };
 
 export default function AccountPage() {
-  const router = useRouter();
   const { user, setUser, clearUser, refreshUser } = useAuth();
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [step, setStep] = useState<"form" | "otp">("form");
@@ -29,8 +27,10 @@ export default function AccountPage() {
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
 
+  const AUTH_FETCH: RequestInit = { credentials: "include" };
+
   async function loadOrders() {
-    const data = await fetch("/api/account/orders").then((r) => r.json());
+    const data = await fetch("/api/account/orders", AUTH_FETCH).then((r) => r.json());
     setOrders(Array.isArray(data) ? data : []);
   }
 
@@ -40,17 +40,19 @@ export default function AccountPage() {
   }, [user]);
 
   async function doLogin() {
+    if (loading) return;
     setLoginError("");
     setLoading(true);
     try {
       const res = await fetch("/api/auth/login", {
+        ...AUTH_FETCH,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
       });
       const data = await res.json();
       if (data.success && data.otpRequired) {
-        setOtpEmail(data.email || loginEmail);
+        setOtpEmail(data.email || loginEmail.trim().toLowerCase());
         if (data.emailSent === false && data.warning) {
           setOtpNotice(data.warning);
           toast.warning(data.warning);
@@ -70,37 +72,39 @@ export default function AccountPage() {
   }
 
   async function doVerifyOtp() {
+    if (loading) return;
     setLoginError("");
     setLoading(true);
     try {
       const res = await fetch("/api/auth/verify-otp", {
+        ...AUTH_FETCH,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: otpEmail, code: otp }),
       });
       const data = await res.json();
       if (data.success) {
-        setStep("form");
-        setOtp("");
         if (data.user) setUser(data.user);
         else await refreshUser();
         toast.success("Logged in successfully");
-        router.push("/profile");
-      } else {
-        const msg = data.error || "Invalid OTP";
-        setLoginError(msg);
-        toast.error(msg);
+        window.location.assign("/profile");
+        return;
       }
+      const msg = data.error || "Invalid OTP";
+      setLoginError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
   }
 
   async function doResendOtp() {
+    if (loading) return;
     setLoginError("");
     setLoading(true);
     try {
       const res = await fetch("/api/auth/resend-otp", {
+        ...AUTH_FETCH,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: otpEmail }),
@@ -125,10 +129,12 @@ export default function AccountPage() {
   }
 
   async function doSignup() {
+    if (loading) return;
     setSignupError("");
     setLoading(true);
     try {
       const res = await fetch("/api/auth/signup", {
+        ...AUTH_FETCH,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: signupName, email: signupEmail, password: signupPassword }),
@@ -137,19 +143,19 @@ export default function AccountPage() {
       if (data.success && data.user) {
         setUser(data.user);
         toast.success("Account created — you're logged in");
-        router.push("/profile");
-      } else {
-        const msg = data.error || "Sign up failed";
-        setSignupError(msg);
-        toast.error(msg);
+        window.location.assign("/profile");
+        return;
       }
+      const msg = data.error || "Sign up failed";
+      setSignupError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
   }
 
   async function doLogout() {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/auth/logout", { ...AUTH_FETCH, method: "POST" });
     clearUser();
     setOrders([]);
     toast.success("Logged out");

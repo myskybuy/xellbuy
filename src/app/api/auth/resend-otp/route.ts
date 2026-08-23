@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { sendLoginOtpEmail } from "@/lib/email";
 import { isValidEmail } from "@/lib/password";
 import { createLoginOtp } from "@/lib/otp";
+import { getSession } from "@/lib/session";
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -14,11 +15,15 @@ export async function POST(req: NextRequest) {
 
   const user = await prisma.user.findUnique({ where: { email: cleanEmail } });
   if (!user) {
-    // Don't reveal whether the account exists.
     return NextResponse.json({ success: true, emailSent: true });
   }
 
   const code = await createLoginOtp(cleanEmail);
+
+  const session = await getSession();
+  session.pendingOtpEmail = cleanEmail;
+  await session.save();
+
   const mail = await sendLoginOtpEmail(cleanEmail, code);
 
   if (!mail.sent) {

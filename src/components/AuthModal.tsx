@@ -33,6 +33,8 @@ export default function AuthModal({
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const AUTH_FETCH: RequestInit = { credentials: "include" };
+
   if (!open) return null;
 
   function resetToForm() {
@@ -44,17 +46,19 @@ export default function AuthModal({
 
   async function handleLogin(e: FormEvent) {
     e.preventDefault();
+    if (loading) return;
     setError("");
     setLoading(true);
     try {
       const res = await fetch("/api/auth/login", {
+        ...AUTH_FETCH,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
       });
       const data = await res.json();
       if (data.success && data.otpRequired) {
-        setOtpEmail(data.email || loginEmail);
+        setOtpEmail(data.email || loginEmail.trim().toLowerCase());
         setStep("otp");
         if (data.emailSent === false && data.warning) {
           setNotice(data.warning);
@@ -75,10 +79,12 @@ export default function AuthModal({
 
   async function handleVerifyOtp(e: FormEvent) {
     e.preventDefault();
+    if (loading) return;
     setError("");
     setLoading(true);
     try {
       const res = await fetch("/api/auth/verify-otp", {
+        ...AUTH_FETCH,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: otpEmail, code: otp }),
@@ -100,11 +106,13 @@ export default function AuthModal({
   }
 
   async function handleResendOtp() {
+    if (loading) return;
     setError("");
     setNotice("");
     setLoading(true);
     try {
       const res = await fetch("/api/auth/resend-otp", {
+        ...AUTH_FETCH,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: otpEmail }),
@@ -130,10 +138,12 @@ export default function AuthModal({
 
   async function handleSignup(e: FormEvent) {
     e.preventDefault();
+    if (loading) return;
     setError("");
     setLoading(true);
     try {
       const res = await fetch("/api/auth/signup", {
+        ...AUTH_FETCH,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: signupName, email: signupEmail, password: signupPassword }),

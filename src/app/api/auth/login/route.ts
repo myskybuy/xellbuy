@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { sendLoginOtpEmail } from "@/lib/email";
 import { isValidEmail, verifyPassword } from "@/lib/password";
 import { createLoginOtp } from "@/lib/otp";
+import { getSession } from "@/lib/session";
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
@@ -21,10 +22,14 @@ export async function POST(req: NextRequest) {
   }
 
   const code = await createLoginOtp(cleanEmail);
+
+  const session = await getSession();
+  session.pendingOtpEmail = cleanEmail;
+  await session.save();
+
   const mail = await sendLoginOtpEmail(cleanEmail, code);
 
   if (!mail.sent) {
-    // OTP is stored; in non-prod we still advance to OTP step so login can be tested via console.
     if (mail.codeForDev) {
       return NextResponse.json({
         success: true,

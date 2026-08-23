@@ -13,37 +13,41 @@ export async function createLoginOtp(email: string) {
   const cleanEmail = email.trim().toLowerCase();
   const code = generateOtpCode();
   const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60 * 1000);
+  const now = new Date();
 
-  // Clear any previous unused OTPs for this email so only the latest is valid.
-  await prisma.loginOtp.deleteMany({ where: { email: cleanEmail } });
-  await prisma.loginOtp.create({ data: { email: cleanEmail, code, expiresAt } });
+  // Atomic upsert avoids deleteMany+create race (live double-submit).
+  await prisma.loginOtp.upsert({
+    where: { email: cleanEmail },
+    create: { email: cleanEmail, code, expiresAt, attempts: 0, createdAt: now },
+    update: { code, expiresAt, attempts: 0, createdAt: now },
+  });
 
   return code;
 }
 
 export async function verifyLoginOtp(email: string, code: string) {
   const cleanEmail = email.trim().toLowerCase();
-  const cleanCode = code.trim();
+  const cleanCode = code.replace(/\D/g, "").trim();
 
-  const otp = await prisma.loginOtp.findFirst({
-    where: { email: cleanEmail },
-    orderBy: { createdAt: "desc" },
-  });
+  if (!cleanEmail || cleanCode.length !== 6) {
+    return { ok: false, error: "Email and 6-digit OTP are required." };
+  }
+
+  const otp = await prisma.loginOtp.findUnique({ where: { email: cleanEmail } });
 
   if (!otp) {
     return { ok: false, error: "No OTP found. Please request a new one." };
   }
 
-  // Prefer createdAt-based TTL to avoid Postgres timezone / expiresAt skew on VPS.
   const validUntil =
     new Date(otp.createdAt.getTime() + OTP_TTL_MINUTES * 60 * 1000).getTime() + OTP_GRACE_MS;
   if (Date.now() > validUntil) {
-    await prisma.loginOtp.delete({ where: { id: otp.id } });
+    await prisma.loginOtp.delete({ where: { id: otp.id } }).catch(() => {});
     return { ok: false, error: "OTP expired. Please request a new one." };
   }
 
   if (otp.attempts >= MAX_ATTEMPTS) {
-    await prisma.loginOtp.delete({ where: { id: otp.id } });
+    await prisma.loginOtp.delete({ where: { id: otp.id } }).catch(() => {});
     return { ok: false, error: "Too many incorrect attempts. Please request a new OTP." };
   }
 
@@ -52,6 +56,6 @@ export async function verifyLoginOtp(email: string, code: string) {
     return { ok: false, error: "Incorrect OTP. Please try again." };
   }
 
-  await prisma.loginOtp.delete({ where: { id: otp.id } });
+  await prisma.loginOtp.delete({ where: { id: otp.id } }).catch(() => {});
   return { ok: true as const };
 }
