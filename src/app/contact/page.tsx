@@ -28,17 +28,30 @@ export default function ContactPage() {
           <div className="contact-info">
             <div className="eyebrow">Support</div>
             <h2>Contact us</h2>
-            <p>Orders, returns, or product questions — we&apos;re here to help.</p>
+            <p>Got a question about a product, an order, or anything in between? We&apos;re here.</p>
             <div className="contact-card">
               <strong>{COMPANY.name}</strong>
-              <p>{COMPANY.address}</p>
               <p>
+                <strong>Registered Office</strong>
+                <br />
+                {COMPANY.address}
+              </p>
+              <p>
+                <strong>Email:</strong>{" "}
+                <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
+              </p>
+              <p>
+                <strong>Phone:</strong>{" "}
                 <a href={`tel:${COMPANY.phone.replace(/\s/g, "")}`}>{COMPANY.phone}</a>
               </p>
               <p>
-                <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
+                <strong>Support hours:</strong> {COMPANY.supportHours}
               </p>
             </div>
+            <p style={{ color: "var(--color-muted)", fontSize: 14, marginTop: 16, lineHeight: 1.6 }}>
+              If your query is about a specific order, having your Order ID ready when you write in or call will get you
+              a faster, more accurate answer.
+            </p>
           </div>
           <div className="contact-form-wrap">
             <h3>Send a message</h3>

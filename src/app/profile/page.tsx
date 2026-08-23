@@ -3,45 +3,51 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useAuth } from "@/components/AuthProvider";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import StoreShell from "@/components/StoreShell";
 
-type User = { id: number; name: string; email: string };
 type Order = { id: number; total: number; status: string; createdAt: string; items: unknown[] };
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const { user, clearUser, loading: authLoading, refreshUser } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [ordersLoading, setOrdersLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/auth/me")
+    if (authLoading) return;
+    if (!user) {
+      // Session may still be settling after signup — one refresh before bounce.
+      refreshUser().then((u) => {
+        if (!u) router.replace("/account");
+      });
+      return;
+    }
+
+    setOrdersLoading(true);
+    fetch("/api/account/orders")
       .then((r) => r.json())
-      .then(async (d) => {
-        if (!d.user) {
-          router.replace("/account");
-          return;
-        }
-        setUser(d.user);
-        const orderRes = await fetch("/api/account/orders");
-        const orderData = await orderRes.json();
-        setOrders(Array.isArray(orderData) ? orderData : []);
-      })
-      .finally(() => setLoading(false));
-  }, [router]);
+      .then((data) => setOrders(Array.isArray(data) ? data : []))
+      .finally(() => setOrdersLoading(false));
+  }, [user, authLoading, refreshUser, router]);
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
+    clearUser();
+    toast.success("Logged out");
     router.push("/account");
   }
 
-  if (loading) {
+  if (authLoading || (!user && ordersLoading)) {
     return (
       <StoreShell>
         <SiteHeader showSearch={false} />
-        <div className="cart-page"><p>Loading…</p></div>
+        <div className="cart-page">
+          <p>Loading…</p>
+        </div>
         <SiteFooter />
       </StoreShell>
     );
@@ -68,7 +74,9 @@ export default function ProfilePage() {
         </div>
 
         <h3 className="profile-section-title">Recent orders</h3>
-        {orders.length ? (
+        {ordersLoading ? (
+          <p style={{ color: "var(--color-muted)" }}>Loading orders…</p>
+        ) : orders.length ? (
           orders.map((o) => (
             <div key={o.id} className="order-card">
               <div className="order-head">

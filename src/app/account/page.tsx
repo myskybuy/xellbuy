@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
@@ -11,6 +12,7 @@ import { useAuth } from "@/components/AuthProvider";
 type Order = { id: number; total: number; status: string; createdAt: string; items: unknown[] };
 
 export default function AccountPage() {
+  const router = useRouter();
   const { user, setUser, clearUser, refreshUser } = useAuth();
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [step, setStep] = useState<"form" | "otp">("form");
@@ -83,6 +85,7 @@ export default function AccountPage() {
         if (data.user) setUser(data.user);
         else await refreshUser();
         toast.success("Logged in successfully");
+        router.push("/profile");
       } else {
         const msg = data.error || "Invalid OTP";
         setLoginError(msg);
@@ -134,6 +137,7 @@ export default function AccountPage() {
       if (data.success && data.user) {
         setUser(data.user);
         toast.success("Account created — you're logged in");
+        router.push("/profile");
       } else {
         const msg = data.error || "Sign up failed";
         setSignupError(msg);

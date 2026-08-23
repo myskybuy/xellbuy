@@ -3,9 +3,10 @@ export const COMPANY = {
   brand: "Xellbuy",
   address:
     "4th Floor, Building/Flat No. 435, A.R. Mall, Opp. Panvel Point, Mota Varachha, Surat, Gujarat – 394101",
-  phone: "+91 92135-58031",
+  phone: "+91 92136-23743",
   email: "hello@xellbuy.com",
   website: "https://xellbuy.com",
+  supportHours: "Monday–Saturday, 10:00 AM – 6:30 PM IST",
 };
 
 export type PolicyContent = {
@@ -17,280 +18,254 @@ export type PolicyContent = {
 export const policies: Record<string, PolicyContent> = {
   "return-policy": {
     title: "Return Policy",
-    intro: `At ${COMPANY.brand}, we want you to be confident in every purchase — whether you are buying a face serum, a shampoo for everyday use, a makeup essential, or a body care product. This Return Policy explains when and how you may return eligible products purchased from our online store.`,
+    intro:
+      "We know beauty products are personal — here's exactly what makes something returnable at Xellbuy, and what doesn't.",
     sections: [
       {
-        heading: "1. Return window",
-        body: "You may request a return within 7 (seven) calendar days from the date of delivery, as shown on your order confirmation / courier delivery record. Requests raised after this window may be declined unless the product is defective or we delivered an incorrect item.",
+        heading: "How long you have",
+        body: "You get a 7-day window from your delivery date to raise a return request. This is checked against the courier's own delivery timestamp, so keep an eye on your tracking updates. If something arrives defective or isn't what you ordered, we handle that separately — see the section below; no 7-day clock is involved for those cases.",
       },
       {
-        heading: "2. Eligible products",
-        body: "Returns are accepted for unused, unwashed, undamaged products sold as skincare, haircare, makeup, bath & body and fragrance products, when all of the following conditions are met:",
+        heading: "What qualifies for return",
+        body: "A return is accepted when all of the following are true:",
         bullets: [
-          "The item is in original condition with all tags, labels, dust bags, and brand packaging intact.",
-          "The product has not been used outdoors, soiled, scratched, or altered in any way.",
-          "You provide the original invoice / order number and clear photos if we request them.",
-          "The product matches the SKU and description of the item you ordered.",
+          "The product is completely unused and unopened — this matters a lot for beauty items.",
+          "Seals, shrink-wrap, and any tamper-evident packaging are still intact.",
+          "Original box, batch sticker and any inner packaging are all present.",
+          "You can share your order number and, if we ask, a few clear photos.",
+          "The item matches exactly what shows on your order confirmation.",
         ],
       },
       {
-        heading: "3. Non-returnable items",
-        body: "For hygiene, safety and commercial reasons, the following are generally not eligible for return unless they arrive damaged or incorrect:",
-        bullets: [
-          "Personalised or custom-made items (if offered).",
-          "Clearance / final-sale products marked as non-returnable at checkout.",
-          "Products without original packaging, missing accessories, or with signs of use.",
-          "Gift cards or promotional freebies (if any).",
-        ],
+        heading: "What we can't accept back",
+        body: "Because these are personal-use products, a few categories are excluded from returns for hygiene reasons regardless of condition — opened or used skincare, haircare or makeup, any lip or eye product once the seal is broken, items marked \"final sale,\" and free samples or testers included with an order. If any of these arrive damaged, defective, or wrong, that's a different process — covered next.",
       },
       {
-        heading: "4. How to initiate a return",
-        body: `Email ${COMPANY.email} or call ${COMPANY.phone} with your order number, product name, reason for return, and photos of the item and packaging. Our support team will respond within 1–2 business days with approval status and reverse pickup / self-ship instructions where applicable.`,
+        heading: "How to request a return",
+        body: `Email ${COMPANY.email} or call ${COMPANY.phone} with your order number, which product it's for, and the reason. We typically get back to you within 1–2 business days with either pickup arrangements or self-ship instructions, whichever suits your location.`,
       },
       {
-        heading: "5. Inspection & approval",
-        body: "Once we receive the returned product, our warehouse team inspects it. Approved returns are processed under our Refund Policy. If the return is rejected (for example, due to use, missing tags, or incomplete packaging), we will inform you and may ship the item back at your cost.",
+        heading: "What we do once it reaches us",
+        body: "Our team checks the returned item against the conditions above before approving anything. If it passes, we move straight into processing your refund. If it doesn't — say, the seal's broken or packaging is missing — we'll explain why and may need to send it back to you, with shipping on your side.",
       },
       {
-        heading: "6. Wrong / damaged / defective items",
-        body: "If you receive a damaged, defective, or incorrect product, please contact us within 48 hours of delivery with unboxing photos/videos. We will arrange a replacement or return–refund as per stock availability, at no extra shipping cost to you in verified cases.",
+        heading: "Received something damaged, wrong, or expired?",
+        body: "This one's on us to fix quickly. Get in touch within 48 hours of delivery with photos of the unboxing, and we'll arrange either a replacement or a full refund — no shipping cost to you once it's confirmed.",
       },
       {
-        heading: "7. Company details",
-        body: `Returns are handled by ${COMPANY.name}, ${COMPANY.address}. For any dispute relating to returns, Indian law applies and courts at Surat, Gujarat shall have jurisdiction.`,
+        heading: "Legal",
+        body: `Returns are managed by ${COMPANY.name}. Any legal dispute is governed by Indian law, with courts in Surat, Gujarat having jurisdiction.`,
       },
     ],
   },
 
   "refund-policy": {
     title: "Refund Policy",
-    intro: `This Refund Policy describes how ${COMPANY.brand} processes refunds for cancelled orders, approved returns, failed deliveries, and payment-related issues on products such as skincare, haircare, makeup, bath & body and fragrance items purchased through our website.`,
+    intro: "Here's the honest breakdown of how and when your money comes back.",
     sections: [
       {
-        heading: "1. When refunds are issued",
-        body: "Refunds are initiated after we confirm one of the following:",
+        heading: "Cases where a refund kicks in",
+        body: "A refund applies when:",
         bullets: [
-          "Your return has been received and approved after inspection.",
-          "Your order was cancelled before dispatch and payment was already captured.",
-          "Payment was deducted but the order could not be confirmed / fulfilled.",
-          "We could not deliver the order due to our operational failure (verified cases).",
+          "Your returned product passed inspection and was approved.",
+          "You cancelled before dispatch and had already paid online.",
+          "A payment was deducted but your order never actually went through.",
+          "We couldn't fulfil the order due to something on our side.",
         ],
       },
       {
-        heading: "2. Online payments (Razorpay — UPI / Card / Netbanking)",
-        body: "For prepaid orders, refunds are credited to the original payment method used at checkout. Once we approve the refund, bank/UPI settlement typically completes within 5–7 business days. Exact timing depends on your bank or UPI app and is outside our direct control after we initiate the refund with the payment gateway.",
+        heading: "Paid online?",
+        body: "Refunds go back to the exact card, UPI ID or bank account you paid with — we can't redirect it elsewhere. Once approved on our end, expect it to land within 5–7 business days, though the final leg depends on your bank or UPI app's own processing time, which we can't speed up.",
       },
       {
-        heading: "3. Cash on Delivery (COD) orders",
-        body: "For COD purchases, there is no prepaid amount to reverse at the time of order. If a COD order is returned and approved, we will refund the product amount via UPI or bank transfer to the account details you share by email. Please allow 7–10 business days after approval for the transfer to reflect.",
+        heading: "Paid Cash on Delivery?",
+        body: "Since no payment was collected at the time of the order, there's nothing to reverse automatically. For an approved COD return, we'll email you asking for a UPI ID or bank account, then transfer the amount directly — usually completed within 7–10 business days of approval.",
       },
       {
-        heading: "4. What is refunded",
-        body: "Product price (after any coupon discount already applied) is refundable for approved returns/cancellations. Shipping charges are non-refundable except where the return is due to our error (wrong item shipped) or a verified manufacturing defect.",
+        heading: "What you actually get back",
+        body: "The product price, minus any coupon that was already applied, is refundable. Shipping charges don't come back unless the return was our fault — wrong item sent, or a confirmed manufacturing defect.",
       },
       {
-        heading: "5. Partial refunds",
-        body: "If an order contains multiple items and only some are returned, we refund only the approved returned products. Coupon discounts may be recalculated proportionally where applicable.",
+        heading: "Only returning part of a bigger order?",
+        body: "We refund just the item(s) that were returned and approved, not the whole order value. If a discount code applied across the full cart, we recalculate its share against what's actually being refunded.",
       },
       {
-        heading: "6. Failed / duplicate payments",
-        body: `If your account was charged more than once for the same order, write to ${COMPANY.email} with payment screenshots and order ID. After verification with our payment partner, we will refund the duplicate amount to the original method.`,
+        heading: "Charged more than once for the same order?",
+        body: `Send payment screenshots and your order ID to ${COMPANY.email}. We'll verify with our payment gateway and push the duplicate amount back to your original payment method once confirmed.`,
       },
       {
-        heading: "7. Communication",
-        body: `Refund status updates are shared on your registered email. For help, contact ${COMPANY.email} or ${COMPANY.phone}. Operated by ${COMPANY.name}.`,
+        heading: "Updates & support",
+        body: `You'll see refund updates land in your registered email as things progress. Questions along the way — ${COMPANY.email} or ${COMPANY.phone}. We're ${COMPANY.name}, and we do read these emails ourselves.`,
       },
     ],
   },
 
   "cancellation-policy": {
     title: "Cancellation Policy",
-    intro: `We understand plans can change. This Cancellation Policy explains how customers of ${COMPANY.brand} can cancel orders for skincare, haircare, makeup and fragrance products, and what happens after an order is packed or shipped.`,
+    intro:
+      "Sometimes you just need to cancel — here's how that works depending on where your order is in the process.",
     sections: [
       {
-        heading: "1. Cancellation before dispatch",
-        body: `You may request cancellation any time before the order is marked as shipped / handed over to the courier. Email ${COMPANY.email} or call ${COMPANY.phone} with your order ID and reason. Once our team confirms the order has not left the warehouse, we will cancel it.`,
+        heading: "Order hasn't shipped yet",
+        body: `This is the simple case. Write to ${COMPANY.email} or call ${COMPANY.phone} with your order ID and we'll check if it's still sitting with us. If the courier hasn't picked it up, we cancel it right there.`,
       },
       {
-        heading: "2. Prepaid cancellations",
-        body: "If you paid online and cancellation is approved before dispatch, a full refund of the paid amount (including shipping, if charged) will be initiated as per our Refund Policy.",
+        heading: "If you'd already paid online",
+        body: "Once we confirm the cancellation before dispatch, your entire payment — product price and any shipping charge — is refunded per our Refund Policy, no deductions.",
       },
       {
-        heading: "3. COD cancellations",
-        body: "COD orders cancelled before dispatch are simply closed in our system. No payment is collected. Repeated frivolous COD cancellations may lead to future COD restriction on your account to protect our fulfilment partners.",
+        heading: "If it was a COD order",
+        body: "Nothing needs refunding since no money was ever collected. We just mark it cancelled in our system. One thing worth knowing: if COD cancellations become a repeated pattern on an account, we may restrict COD as a payment option for future orders — it helps us keep things fair for our delivery partners.",
       },
       {
-        heading: "4. After dispatch",
-        body: "Once an order is shipped, it cannot be cancelled through the website. You may:",
-        bullets: [
-          "Refuse delivery at the doorstep (where the courier allows), after which the parcel returns to us and we process as per return inspection rules; or",
-          "Accept delivery and raise a return request within the return window under our Return Policy.",
-        ],
+        heading: "Order's already left our warehouse",
+        body: "At this point, cancelling through the site isn't possible anymore. You've still got options — decline the package at your doorstep if the courier permits it (it'll route back to us for standard return processing), or simply accept it and file a return request within our usual window instead.",
       },
       {
-        heading: "5. Our right to cancel",
-        body: "We may cancel an order if the product is out of stock, pricing/listing error is detected, payment is incomplete or fraudulent, or delivery is not possible to your address/pincode. In such cases, any amount paid will be refunded.",
+        heading: "When we cancel from our end",
+        body: "Occasionally we have to — a product sells out faster than our stock count updates, we catch a listing or pricing mistake, a payment looks incomplete or suspicious, or your pin code turns out to be outside our delivery zone. Whenever this happens, we refund whatever was paid, in full, automatically.",
       },
       {
-        heading: "6. Order status",
-        body: "You can track order status from your Profile / Account page after logging in. For urgent cancellations, contact us as early as possible — once packing and courier handover begin, cancellation options reduce.",
+        heading: "Want to check your order status?",
+        body: "It's visible anytime under your account's Orders section. If a cancellation is time-sensitive, reach out as early as you can — once packing starts, the window closes fast.",
       },
     ],
   },
 
   "shipping-delivery-policy": {
     title: "Shipping & Delivery Policy",
-    intro: `${COMPANY.brand} ships carefully packed skincare, haircare, makeup and fragrance products across India. This policy explains dispatch timelines, delivery estimates, shipping charges, and what to do if a shipment is delayed or damaged.`,
+    intro: "The practical details on how your order gets to you.",
     sections: [
       {
-        heading: "1. Serviceable locations",
-        body: "We deliver to most pin codes across India through trusted courier and logistics partners. Some remote, restricted, or high-risk locations may have limited service, longer timelines, or COD restrictions. Serviceability is confirmed at checkout / fulfilment.",
+        heading: "Pin codes we cover",
+        body: "We ship across the vast majority of India using established courier partners. A small number of remote or restricted pin codes may face longer delivery windows or reduced COD availability — this shows up automatically at checkout if it applies to you.",
       },
       {
-        heading: "2. Order processing & dispatch",
-        body: "Orders are usually processed and dispatched within 1–3 business days after confirmation (excluding Sundays and public holidays). During sales or high-demand periods, dispatch may take slightly longer. You will receive shipment updates on email / SMS where available.",
+        heading: "Time to dispatch",
+        body: "Once your order is confirmed, it typically leaves our facility within 1–3 business days, not counting Sundays or public holidays. Sale periods can add a bit of extra time on our end — we'll notify you by email or SMS if that's the case.",
       },
       {
-        heading: "3. Delivery timelines",
-        body: "After dispatch, standard delivery typically takes 3–7 business days depending on your city and pin code. Metro and Tier-1 cities are often faster; remote areas may take 7–10 business days. These are estimated timelines, not guaranteed delivery dates.",
+        heading: "How long delivery takes after that",
+        body: "Most metro and Tier-1 city orders arrive within 3–7 business days of dispatch. More remote locations can take up to 7–10 business days. These are realistic estimates based on courier performance, not fixed promises — occasional delays outside our control can happen.",
       },
       {
-        heading: "4. Shipping charges",
-        body: "Any shipping fee applicable to your order is shown clearly at checkout before you place the order. Promotional free-shipping offers, if live, will also be reflected at checkout.",
+        heading: "Shipping charges, if any",
+        body: "Whatever shipping fee applies is shown at checkout before you confirm your order — never as a surprise afterward. Any live free-shipping offer will also show up there.",
       },
       {
-        heading: "5. Packaging",
-        body: "Products are packed securely to protect against leakage, breakage and damage in transit, especially glass bottles and pump packaging. Please inspect the outer carton on delivery and note visible damage with the courier before accepting, wherever possible.",
+        heading: "How your order is packed",
+        body: "Beauty products travel with extra care — bottles, tubes and glass packaging get cushioned specifically to survive transit without leaking or cracking. When your parcel arrives, a quick glance at the outer box before accepting it is a good habit; flag anything visibly damaged with the courier if you can.",
       },
       {
-        heading: "6. Failed delivery attempts",
-        body: "Couriers usually attempt delivery more than once. If delivery fails due to incorrect address, unreachable phone number, or repeated non-availability, the shipment may return to us. Re-shipping may attract additional charges.",
+        heading: "If delivery attempts don't work out",
+        body: "Courier partners generally try more than once before giving up. If they still can't reach you — say, an unreachable number or repeated unavailability — the order returns to us, and sending it out again may involve an additional shipping charge.",
       },
       {
-        heading: "7. Damaged / missing parcels",
-        body: `If the parcel arrives damaged or contents are missing, contact ${COMPANY.email} within 48 hours with photos of the package and product. We will coordinate with the logistics partner and arrange a suitable resolution.`,
+        heading: "Parcel arrived damaged, or something's missing?",
+        body: "Reach out within 48 hours with photos of the box and the product itself. We'll coordinate with the courier partner directly and get you a resolution.",
       },
       {
-        heading: "8. Contact",
-        body: `${COMPANY.name}, ${COMPANY.address}. Phone: ${COMPANY.phone}. Email: ${COMPANY.email}.`,
+        heading: "Get in touch",
+        body: `${COMPANY.name}, ${COMPANY.address} | ${COMPANY.phone} | ${COMPANY.email}`,
       },
     ],
   },
 
   "privacy-policy": {
     title: "Privacy Policy",
-    intro: `This Privacy Policy explains how ${COMPANY.name} (“we”, “us”, “${COMPANY.brand}”) collects, uses, stores and protects your personal information when you browse our website, create an account, place an order for beauty products, or contact our support team. We are committed to handling your data responsibly in line with applicable Indian laws including the Information Technology Act, 2000 and related rules.`,
+    intro: "A plain-language explanation of how Xellbuy handles your personal information.",
     sections: [
       {
-        heading: "1. Information we collect",
-        body: "Depending on how you use Xellbuy, we may collect:",
-        bullets: [
-          "Identity & contact details: name, email address, phone number, shipping/billing address.",
-          "Account data: login credentials (stored as a secure password hash), order history.",
-          "Transaction data: products purchased, amounts, payment method type (COD / online), payment status.",
-          "Technical data: browser type, device information, IP address, and basic analytics cookies needed to run the site.",
-          "Communications: messages you send via contact forms, email, or phone.",
-        ],
+        heading: "What we collect from you",
+        body: "Your name, phone number, email, and delivery/billing address, to start. If you have an account, we keep your login credentials (never as plain text) and your order history. We also track what you've bought, how much you paid, and whether it was COD or an online payment, plus basic technical details like browser type, device and IP address through the cookies that keep the site functioning. Anything you send us via a contact form, email, or call is stored too.",
       },
       {
-        heading: "2. How we use your information",
-        body: "We use your information to:",
-        bullets: [
-          "Process, fulfil and deliver orders of skincare, haircare, makeup and fragrance products.",
-          "Send order confirmations, shipping updates and customer support replies.",
-          "Operate login sessions and protect accounts against unauthorised access.",
-          "Improve website performance, product catalogue and user experience.",
-          "Comply with legal, tax, accounting and fraud-prevention requirements.",
-        ],
+        heading: "Why we actually need it",
+        body: "Primarily to get your order to you correctly — confirmations, shipping updates, and support replies all depend on this data. Beyond that, it helps us keep your account secure, understand how the site is used so we can improve it, and meet tax and accounting requirements under Indian law.",
       },
       {
-        heading: "3. Legal basis / consent",
-        body: "By creating an account, placing an order, or submitting a contact form, you consent to processing of your information for the purposes described in this policy. You may withdraw consent for marketing communications at any time by writing to us (transactional emails related to orders may still be sent).",
+        heading: "About your consent",
+        body: "By creating an account, checking out, or messaging us through a contact form, you're agreeing to this kind of processing. Marketing emails are opt-out any time you like — order and delivery-related emails will keep coming regardless, since we need those to actually get your products to you.",
       },
       {
-        heading: "4. Sharing of information",
-        body: "We do not sell your personal information. We may share limited data with:",
-        bullets: [
-          "Logistics / courier partners — to deliver your order.",
-          "Payment gateways (e.g. Razorpay) — to process online payments securely.",
-          "IT / hosting providers — to operate our website and databases.",
-          "Authorities — when required by law or to protect our legal rights.",
-        ],
+        heading: "Who we share data with",
+        body: "We don't sell your information to anyone. It's shared only where necessary: courier partners to deliver your parcel, Razorpay to process online payments securely, our hosting providers to keep the site running, and authorities where legally required.",
       },
       {
-        heading: "5. Cookies & similar technologies",
-        body: "We use essential cookies for session login and cart continuity. We may use limited analytics to understand traffic patterns. You can control cookies through your browser settings; disabling essential cookies may affect login and checkout.",
+        heading: "Cookies, briefly",
+        body: "We use essential cookies so your login and cart persist as you browse, and some lightweight analytics to see how the site is being used overall. Your browser settings let you turn these off, though checkout and login may not work properly without the essential ones.",
       },
       {
-        heading: "6. Data security & retention",
-        body: "We use reasonable technical and organisational measures (including encrypted session cookies and hashed passwords) to protect your data. Order and account records are retained as long as needed for business, legal and tax purposes, then deleted or anonymised where practicable.",
+        heading: "How we protect it",
+        body: "Passwords are hashed, sessions are encrypted, and we don't keep data any longer than business, legal or tax obligations require — after that, records are deleted or anonymised where feasible.",
       },
       {
-        heading: "7. Your rights",
-        body: `You may request access, correction, or deletion of your personal data (subject to legal retention needs) by emailing ${COMPANY.email}. We may need to verify your identity before processing such requests.`,
+        heading: "If you want to see or delete your data",
+        body: `Email ${COMPANY.email} and we'll help, after verifying it's genuinely you asking (a quick identity check protects your data as much as ours).`,
       },
       {
-        heading: "8. Children’s privacy",
-        body: "Our store is intended for users aged 18+. We do not knowingly collect personal information from children. If you believe a minor has provided data, contact us for removal.",
+        heading: "One note on age",
+        body: "Xellbuy is meant for shoppers 18 and older. We don't intentionally collect data from minors — if you believe we have, let us know and we'll remove it.",
       },
       {
-        heading: "9. Grievance / contact",
-        body: `For privacy concerns, contact: ${COMPANY.email} | ${COMPANY.phone}. Postal address: ${COMPANY.name}, ${COMPANY.address}.`,
+        heading: "Reach us",
+        body: `${COMPANY.email} | ${COMPANY.phone} | ${COMPANY.name}, Surat, Gujarat.`,
       },
     ],
   },
 
   "terms-of-use": {
     title: "Terms of Use",
-    intro: `Welcome to ${COMPANY.brand}. These Terms of Use (“Terms”) govern your access to and use of our website, mobile browsing experience, and purchase of products including skincare, haircare, makeup, bath & body and fragrance items. By using the site, you agree to these Terms. If you do not agree, please do not use the website.`,
+    intro:
+      "Using xellbuy.com means you're agreeing to the terms below — please read them before you check out.",
     sections: [
       {
-        heading: "1. About the seller",
-        body: `The website is operated by ${COMPANY.name}, registered address: ${COMPANY.address}. Contact: ${COMPANY.email}, ${COMPANY.phone}.`,
+        heading: "Who's behind this site",
+        body: `Xellbuy is run by ${COMPANY.name}, registered at ${COMPANY.address}. You can reach us at ${COMPANY.email} or ${COMPANY.phone}.`,
       },
       {
-        heading: "2. Eligibility",
-        body: "You must be at least 18 years old and capable of entering into a binding contract under Indian law to place orders. By placing an order, you represent that the information you provide is accurate and complete.",
+        heading: "Eligibility to shop",
+        body: "You need to be at least 18 and legally capable of entering a contract in India. Placing an order means you're confirming the details you've provided are correct.",
       },
       {
-        heading: "3. Products & pricing",
-        body: "We aim to display accurate product titles, descriptions, images and INR prices. Minor variations in colour, texture or finish may occur due to screen settings or manufacturer batches. Prices and offers may change without prior notice. In case of an obvious pricing error, we reserve the right to cancel the order and refund any amount paid.",
+        heading: "About our listings and prices",
+        body: "We try to keep every product description, image and ₹ price accurate, but minor shade or texture differences can occur between what's on-screen and the actual product, especially with makeup and skincare batches — that's normal, not a fault. Prices can be revised without prior notice, and if a listing has an obvious pricing error, we can cancel that order and refund whatever you paid.",
       },
       {
-        heading: "4. Orders & acceptance",
-        body: "An order placed on the website is an offer to buy. Order confirmation email does not always mean final acceptance — acceptance occurs when we confirm fulfilment / dispatch. We may refuse or cancel orders for stock unavailability, suspected fraud, or serviceability issues.",
+        heading: "When your order counts as accepted",
+        body: "An order you place is an offer, not an automatic sale — a confirmation email doesn't guarantee fulfilment. We consider it accepted once we've confirmed dispatch. We can still decline or cancel orders for reasons like stock shortages, suspected fraud, or delivery limitations to your area.",
       },
       {
-        heading: "5. Payments",
-        body: "We accept Cash on Delivery (where available) and online payments via supported gateways (UPI, cards, netbanking). Online payment processing is handled by third-party providers; we do not store full card details on our servers.",
+        heading: "How you can pay",
+        body: "Cash on Delivery (where available), or online via UPI, card or netbanking through our payment partners. Full card information is never stored on our own servers.",
       },
       {
-        heading: "6. User accounts",
-        body: "You are responsible for keeping your login credentials confidential and for all activity under your account. Notify us immediately of any unauthorised use. We may suspend accounts that violate these Terms or engage in abuse (including repeated false COD refusals).",
+        heading: "Your account and your responsibility for it",
+        body: "Keep your login private, and tell us right away if you spot anything unusual. We reserve the right to suspend accounts that misuse the platform — including repeatedly refusing COD orders without genuine reason.",
       },
       {
-        heading: "7. Intellectual property",
-        body: "All website content — logos, text, graphics, product photography and design — is owned by or licensed to us. You may not copy, scrape, or commercially reuse content without written permission.",
+        heading: "Who owns the content on this site",
+        body: "Everything you see — logos, product photography, descriptions, layout — belongs to us or is used under licence. Copying or reusing it commercially without our written permission isn't allowed.",
       },
       {
-        heading: "8. Prohibited use",
-        body: "You agree not to misuse the site, attempt unauthorised access, interfere with security, post unlawful content, or use the platform for fraudulent transactions.",
+        heading: "Playing fair on the platform",
+        body: "Please don't attempt unauthorised access, interfere with the site's security, post unlawful content, or try to push fraudulent transactions through. It affects everyone who shops here.",
       },
       {
-        heading: "9. Limitation of liability",
-        body: "To the fullest extent permitted by law, our liability for any claim arising from a product or the website is limited to the amount you paid for the relevant order. We are not liable for indirect, incidental or consequential losses (including delay by courier partners beyond reasonable control).",
+        heading: "Where our responsibility ends",
+        body: "If a product or the site itself causes a problem, our liability is limited to what you paid for that specific order. We're not responsible for indirect losses, including courier delays that are genuinely beyond our control.",
       },
       {
-        heading: "10. Linked policies",
-        body: "Your purchases are also governed by our Return, Refund, Cancellation, Shipping & Delivery and Privacy policies published on this website. Those policies form part of these Terms by reference.",
+        heading: "These Terms work alongside our other policies",
+        body: "Our Return, Refund, Cancellation, Shipping & Delivery and Privacy policies, all published on this site, apply to every purchase and are considered part of these Terms.",
       },
       {
-        heading: "11. Governing law & jurisdiction",
-        body: "These Terms are governed by the laws of India. Exclusive jurisdiction lies with the competent courts at Surat, Gujarat, without prejudice to any rights you may have under applicable consumer protection laws.",
+        heading: "Governing law",
+        body: "These Terms are governed by Indian law, with courts at Surat, Gujarat holding jurisdiction — this doesn't affect any rights you separately have under consumer protection legislation.",
       },
       {
-        heading: "12. Changes to Terms",
-        body: "We may update these Terms from time to time. Continued use of the website after changes constitutes acceptance of the revised Terms. The “Last updated” date on this page reflects the latest revision.",
+        heading: "We may update this page",
+        body: "Continuing to use xellbuy.com after we revise these Terms means you accept the update. Check the \"Last updated\" date here for the most current version.",
       },
     ],
   },

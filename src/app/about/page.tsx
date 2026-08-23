@@ -7,49 +7,26 @@ import { COMPANY } from "@/lib/policies";
 const HERO_IMG = "/images/about/hero.svg";
 const WHO_IMG = "/images/about/who.svg";
 
-const offers = [
+const categoryBlocks = [
   {
     title: "Skincare",
-    text: "Serums, sunscreens, cleansers and moisturisers picked for everyday routines that actually work.",
+    text: "Everyday basics — cleansers, sunscreens, serums and moisturisers chosen for routines people will actually stick with, not 12-step regimens nobody has time for.",
     icon: "🧴",
   },
   {
     title: "Haircare",
-    text: "Shampoos, hair oils, serums and masks for stronger, smoother, healthier-looking hair.",
+    text: "Built around real concerns: frizz, dryness, hair fall, dullness — shampoos, oils, serums and masks that address one of those instead of promising to fix everything at once.",
     icon: "💇‍♀️",
   },
   {
     title: "Makeup",
-    text: "Lip, eye and face essentials in wearable shades for everyday glam and special occasions.",
+    text: "Stays wearable. Lip, eye and face products in shades and finishes meant for daily use, not just for a one-time festival look that sits in a drawer afterward.",
     icon: "💄",
   },
   {
     title: "Bath, Body & Fragrance",
-    text: "Body washes, lotions, deodorants and perfumes that round out a complete self-care routine.",
+    text: "Body washes, lotions, deodorants and perfumes that make the rest of a self-care routine feel finished, not like an afterthought.",
     icon: "🧼",
-  },
-];
-
-const reasons = [
-  {
-    num: "01",
-    title: "Quality First",
-    text: "Carefully selected beauty brands with quality in mind — honest listings and clear ingredient-led descriptions.",
-  },
-  {
-    num: "02",
-    title: "Trusted Brands",
-    text: "A curated mix of loved skincare, haircare and makeup labels, chosen for real everyday results.",
-  },
-  {
-    num: "03",
-    title: "Great Value",
-    text: "Beauty essentials with transparent INR pricing — no hidden surprises at checkout.",
-  },
-  {
-    num: "04",
-    title: "Customer Focused",
-    text: "Your shopping experience is at the heart of what we do — COD, easy support, and clear policies.",
   },
 ];
 
@@ -58,17 +35,21 @@ export default function AboutPage() {
     <StoreShell>
       <SiteHeader />
 
-      {/* Hero */}
       <section className="about-hero">
         <div className="container about-split">
           <div className="about-copy">
             <p className="about-eyebrow gold">About Xellbuy</p>
-            <h1>More than just a beauty haul.</h1>
+            <h1>Beauty shouldn&apos;t be complicated. We&apos;re here to make it simple.</h1>
             <p className="about-lead">
-              Xellbuy is an India-first beauty catalogue by {COMPANY.name}. We bring together skincare,
-              haircare, makeup and fragrance from brands you trust — so you can build a routine that
-              works, with transparent pricing, honest listings, and a checkout experience built for
-              Indian shoppers, including Cash on Delivery.
+              Xellbuy exists because shopping for skincare and beauty online in India can feel oddly overwhelming —
+              hundreds of near-identical products, confusing ingredient claims, and no easy way to tell what&apos;s
+              actually worth your money. We built Xellbuy as the antidote to that: a tighter, more honest selection of
+              skincare, haircare, makeup and body-care essentials, picked because they work, not because they&apos;re
+              trending for a week.
+            </p>
+            <p className="about-lead">
+              We&apos;re run by {COMPANY.name} out of Surat, and our team is small on purpose. It lets us actually look
+              at what we&apos;re listing instead of just uploading a catalogue feed and hoping for the best.
             </p>
             <Link href="/shop" className="btn btn-accent about-cta">
               Explore Our Collection →
@@ -80,44 +61,41 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Who we are */}
       <section className="about-who">
         <div className="container about-split reverse">
           <div className="about-media">
             <img src={WHO_IMG} alt="Xellbuy beauty products" />
           </div>
           <div className="about-copy">
-            <p className="about-eyebrow teal">Who We Are</p>
-            <h2>Made For Your Everyday Routine.</h2>
+            <p className="about-eyebrow teal">How we pick</p>
+            <h2>What goes on the site — and what doesn&apos;t.</h2>
             <p>
-              At Xellbuy, we believe good beauty products do more than sit on a shelf — they support
-              how you feel every day. Whether you are building a simple skincare routine, restocking
-              your favourite shampoo, or picking up a new lipstick shade, the right product should feel
-              reliable, be well-priced, and fit real Indian routines.
+              Every product goes through a basic filter before it&apos;s listed: is the description honest, is the
+              packaging something we&apos;d trust with our own skin, and is the price fair once you compare it against
+              what&apos;s actually inside the bottle. We&apos;re not chasing every new launch — we&apos;d rather have
+              fewer products we stand behind than a catalogue padded with filler.
             </p>
             <p>
-              We curate products with a focus on trusted brands, clear pricing in ₹, and a shopping
-              experience that feels simple and trustworthy. From first visit to delivery, our goal is
-              to help you choose with confidence — with honest product details, responsive support, and
-              policies designed around how customers actually shop online.
+              Prices are shown clearly in ₹ with no hidden add-ons at checkout. You can pay via Cash on Delivery if you
+              want to see the product before paying, or complete a quick, secure online payment if you&apos;d rather
+              finish in one step. Either way, support is a real conversation — not a bot loop — whenever something needs
+              sorting.
             </p>
           </div>
         </div>
       </section>
 
-      {/* What we offer */}
       <section className="about-offer">
         <div className="container">
           <div className="about-center-head">
-            <p className="about-eyebrow teal">What We Offer</p>
-            <h2>Designed For Every Routine</h2>
+            <p className="about-eyebrow teal">Our categories</p>
+            <h2>Four categories, and why they exist</h2>
             <p className="about-sub">
-              A curated selection of everyday beauty essentials — skincare, haircare, makeup and
-              fragrance — chosen for quality, value and lasting everyday use.
+              A tighter selection of everyday essentials — chosen for real routines, not noise.
             </p>
           </div>
           <div className="about-offer-grid">
-            {offers.map((item) => (
+            {categoryBlocks.map((item) => (
               <article key={item.title} className="about-offer-card">
                 <div className="about-offer-icon" aria-hidden>
                   {item.icon}
@@ -130,47 +108,22 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Why choose us */}
-      <section className="about-why">
-        <div className="container">
-          <div className="about-center-head">
-            <p className="about-eyebrow teal">Why Xellbuy</p>
-            <h2>Why Choose Us?</h2>
-          </div>
-          <div className="about-why-grid">
-            {reasons.map((r) => (
-              <article key={r.num} className="about-why-item">
-                <span className="about-why-num">{r.num}</span>
-                <h3>{r.title}</h3>
-                <p>{r.text}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Mission */}
       <section className="about-mission">
         <div className="container about-mission-inner">
-          <p className="about-eyebrow gold">Our Mission</p>
-          <h2>Making Everyday Beauty Better, One Product At A Time.</h2>
+          <p className="about-eyebrow gold">Our aim</p>
+          <h2>A beauty store that treats your routine seriously — without making it complicated.</h2>
           <p>
-            Our mission is to make trusted skincare, haircare and makeup accessible to everyone while
-            creating a shopping experience built around quality, trust and customer satisfaction — from
-            discovery on Xellbuy to delivery at your doorstep across India.
+            If you&apos;re looking for honest listings, clear INR pricing, and products we&apos;d stand behind, that&apos;s
+            what we&apos;re aiming to be — from discovery on Xellbuy to delivery at your doorstep across India.
           </p>
         </div>
       </section>
 
-      {/* CTA */}
       <section className="about-bottom-cta">
         <div className="container">
           <div className="about-cta-banner">
-            <h2>Find Your Everyday Essential</h2>
-            <p>
-              Explore our collection and discover the beauty products that fit your skin, hair and
-              everyday routine.
-            </p>
+            <h2>Find your everyday essential</h2>
+            <p>Explore our collection and discover products that fit your skin, hair and everyday routine.</p>
             <Link href="/shop" className="btn about-cta-btn">
               Shop Now →
             </Link>
