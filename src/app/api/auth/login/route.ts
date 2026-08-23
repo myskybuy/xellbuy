@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { sendLoginOtpEmail } from "@/lib/email";
+import { issueOtp } from "@/lib/otp";
 import { isValidEmail, verifyPassword } from "@/lib/password";
-import { createLoginOtp } from "@/lib/otp";
-import { getSession } from "@/lib/session";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,28 +20,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
-    const code = await createLoginOtp(cleanEmail);
-
-    const session = await getSession();
-    session.pendingOtpEmail = cleanEmail;
-    await session.save();
-
-    const mail = await sendLoginOtpEmail(cleanEmail, code);
-
-    if (!mail.sent) {
-      if (mail.codeForDev) {
-        return NextResponse.json({
-          success: true,
-          otpRequired: true,
-          email: cleanEmail,
-          emailSent: false,
-          warning: mail.error,
-        });
-      }
-      return NextResponse.json({ error: mail.error }, { status: 503 });
+    const otp = await issueOtp(cleanEmail, "login");
+    if (!otp.ok) {
+      return NextResponse.json({ error: otp.error }, { status: otp.status });
     }
 
-    return NextResponse.json({ success: true, otpRequired: true, email: cleanEmail, emailSent: true });
+    return NextResponse.json({
+      success: true,
+      otpRequired: true,
+      needsOtp: true,
+      email: cleanEmail,
+      purpose: "login",
+      emailSent: !otp.warning,
+      warning: otp.warning,
+    });
   } catch (err) {
     console.error("[auth/login]", err);
     return NextResponse.json({ error: "Login failed. Please try again." }, { status: 500 });

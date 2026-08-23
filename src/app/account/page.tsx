@@ -25,6 +25,7 @@ export default function AccountPage() {
   const [loginError, setLoginError] = useState("");
   const [signupError, setSignupError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendIn, setResendIn] = useState(0);
   const [orders, setOrders] = useState<Order[]>([]);
 
   const AUTH_FETCH: RequestInit = { credentials: "include" };
@@ -39,6 +40,12 @@ export default function AccountPage() {
     else setOrders([]);
   }, [user]);
 
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const t = setTimeout(() => setResendIn((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendIn]);
+
   async function doLogin() {
     if (loading) return;
     setLoginError("");
@@ -51,8 +58,10 @@ export default function AccountPage() {
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
       });
       const data = await res.json().catch(() => ({}));
-      if (data.success && data.otpRequired) {
+      if (data.success && (data.otpRequired || data.needsOtp)) {
         setOtpEmail(data.email || loginEmail.trim().toLowerCase());
+        setOtp("");
+        setResendIn(60);
         if (data.emailSent === false && data.warning) {
           setOtpNotice(data.warning);
           toast.warning(data.warning);
@@ -80,7 +89,7 @@ export default function AccountPage() {
         ...AUTH_FETCH,
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: otpEmail, code: otp }),
+        body: JSON.stringify({ email: otpEmail, purpose: "login", code: otp }),
       });
       const data = await res.json().catch(() => ({}));
       if (data.success) {
@@ -90,7 +99,7 @@ export default function AccountPage() {
         window.location.assign("/profile");
         return;
       }
-      const msg = data.error || "Invalid OTP";
+      const msg = data.error || "Invalid or expired code";
       setLoginError(msg);
       toast.error(msg);
     } finally {
@@ -99,7 +108,7 @@ export default function AccountPage() {
   }
 
   async function doResendOtp() {
-    if (loading) return;
+    if (loading || resendIn > 0) return;
     setLoginError("");
     setLoading(true);
     try {
@@ -107,16 +116,17 @@ export default function AccountPage() {
         ...AUTH_FETCH,
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: otpEmail }),
+        body: JSON.stringify({ email: otpEmail, purpose: "login" }),
       });
       const data = await res.json().catch(() => ({}));
       if (data.success) {
+        setResendIn(60);
         if (data.emailSent === false && data.warning) {
           setOtpNotice(data.warning);
           toast.warning(data.warning);
         } else {
           setOtpNotice(`A new OTP has been sent to ${otpEmail}.`);
-          toast.success("OTP resent");
+          toast.success("Code resent");
         }
       } else {
         const msg = data.error || "Could not resend OTP";
@@ -231,8 +241,8 @@ export default function AccountPage() {
             {loginError ? <p className="account-error">{loginError}</p> : null}
             <p className="account-note">
               Didn&apos;t get the code?{" "}
-              <button type="button" className="auth-modal-link" onClick={doResendOtp} disabled={loading}>
-                Resend OTP
+              <button type="button" className="auth-modal-link" onClick={doResendOtp} disabled={loading || resendIn > 0}>
+                {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend OTP"}
               </button>
             </p>
             <p className="account-note">

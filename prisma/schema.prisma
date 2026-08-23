@@ -54,13 +54,15 @@ model User {
   orders       Order[]
 }
 
-model LoginOtp {
+model OtpCode {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
-  code      String
+  email     String
+  codeHash  String
+  purpose   String
   expiresAt DateTime
-  attempts  Int      @default(0)
   createdAt DateTime @default(now())
+
+  @@index([email, purpose])
 }
 
 model Order {

@@ -1,24 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { consumeOtp, type OtpPurpose } from "@/lib/otp";
 import { publicUser } from "@/lib/password";
-import { verifyLoginOtp } from "@/lib/otp";
 import { getSession } from "@/lib/session";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const session = await getSession();
+    const { email, purpose, code } = await req.json();
+    const cleanEmail = (email || "").trim().toLowerCase();
+    const otpPurpose: OtpPurpose | "" = purpose === "signup" || purpose === "login" ? purpose : "login";
 
-    const cleanEmail = ((body.email || session.pendingOtpEmail || "") as string).trim().toLowerCase();
-    const cleanCode = (body.code || "").toString().replace(/\D/g, "").trim();
-
-    if (!cleanEmail || !cleanCode) {
+    if (!cleanEmail || !code) {
       return NextResponse.json({ error: "Email and OTP are required" }, { status: 400 });
     }
 
-    const result = await verifyLoginOtp(cleanEmail, cleanCode);
-    if (!result.ok) {
-      return NextResponse.json({ error: result.error }, { status: 401 });
+    const ok = await consumeOtp(cleanEmail, otpPurpose || "login", String(code));
+    if (!ok) {
+      return NextResponse.json({ error: "Invalid or expired code" }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({ where: { email: cleanEmail } });
@@ -26,6 +24,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Account not found" }, { status: 404 });
     }
 
+    const session = await getSession();
     session.userId = user.id;
     session.pendingOtpEmail = undefined;
     await session.save();

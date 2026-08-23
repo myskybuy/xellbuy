@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth, type AuthUser } from "./AuthProvider";
 
@@ -32,8 +32,15 @@ export default function AuthModal({
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendIn, setResendIn] = useState(0);
 
   const AUTH_FETCH: RequestInit = { credentials: "include" };
+
+  useEffect(() => {
+    if (!open || resendIn <= 0) return;
+    const t = setTimeout(() => setResendIn((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [open, resendIn]);
 
   if (!open) return null;
 
@@ -42,6 +49,7 @@ export default function AuthModal({
     setOtp("");
     setError("");
     setNotice("");
+    setResendIn(0);
   }
 
   async function handleLogin(e: FormEvent) {
@@ -57,8 +65,10 @@ export default function AuthModal({
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
       });
       const data = await res.json().catch(() => ({}));
-      if (data.success && data.otpRequired) {
+      if (data.success && (data.otpRequired || data.needsOtp)) {
         setOtpEmail(data.email || loginEmail.trim().toLowerCase());
+        setOtp("");
+        setResendIn(60);
         setStep("otp");
         if (data.emailSent === false && data.warning) {
           setNotice(data.warning);
@@ -87,7 +97,7 @@ export default function AuthModal({
         ...AUTH_FETCH,
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: otpEmail, code: otp }),
+        body: JSON.stringify({ email: otpEmail, purpose: "login", code: otp }),
       });
       const data = await res.json().catch(() => ({}));
       if (data.success && data.user) {
@@ -96,7 +106,7 @@ export default function AuthModal({
         onSuccess(data.user);
         resetToForm();
       } else {
-        const msg = data.error || "Invalid OTP";
+        const msg = data.error || "Invalid or expired code";
         setError(msg);
         toast.error(msg);
       }
@@ -106,7 +116,7 @@ export default function AuthModal({
   }
 
   async function handleResendOtp() {
-    if (loading) return;
+    if (loading || resendIn > 0) return;
     setError("");
     setNotice("");
     setLoading(true);
@@ -115,16 +125,17 @@ export default function AuthModal({
         ...AUTH_FETCH,
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: otpEmail }),
+        body: JSON.stringify({ email: otpEmail, purpose: "login" }),
       });
       const data = await res.json().catch(() => ({}));
       if (data.success) {
+        setResendIn(60);
         if (data.emailSent === false && data.warning) {
           setNotice(data.warning);
           toast.warning(data.warning);
         } else {
           setNotice(`A new OTP has been sent to ${otpEmail}.`);
-          toast.success("OTP resent");
+          toast.success("Code resent");
         }
       } else {
         const msg = data.error || "Could not resend OTP";
@@ -197,8 +208,8 @@ export default function AuthModal({
             </form>
             <p className="account-note">
               Didn&apos;t get the code?{" "}
-              <button type="button" className="auth-modal-link" onClick={handleResendOtp} disabled={loading}>
-                Resend OTP
+              <button type="button" className="auth-modal-link" onClick={handleResendOtp} disabled={loading || resendIn > 0}>
+                {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend OTP"}
               </button>
             </p>
             <p className="account-note">
