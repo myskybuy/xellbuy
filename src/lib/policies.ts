@@ -2,8 +2,8 @@ export const COMPANY = {
   name: "SKYBUY PRIVATE LIMITED",
   brand: "Xellbuy",
   address:
-    "4th Floor, Building/Flat No. 435, A.R. Mall, Opp. Panvel Point, Mota Varachha, Surat, Gujarat – 394101",
-  phone: "+91 92136-23743",
+    "2nd Floor, Building/Flat No. 208, Rangila Park, Sudama Chowk, Mota Varachha, Surat, Gujarat – 394101",
+  phone: "+91 92135-58031",
   email: "hello@xellbuy.com",
   website: "https://xellbuy.com",
   supportHours: "Monday–Saturday, 10:00 AM – 6:30 PM IST",
