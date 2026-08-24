@@ -2,7 +2,7 @@ export const COMPANY = {
   name: "SKYBUY PRIVATE LIMITED",
   brand: "Xellbuy",
   address:
-    "2nd Floor, Building/Flat No. 208, Rangila Park, Sudama Chowk, Mota Varachha, Surat, Gujarat – 394101",
+    "2ND FLOOR,Building No./Flat No.: 208,RANGILA PAR,Surat,Gujarat-394101",
   phone: "+91 92135-58031",
   email: "hello@xellbuy.com",
   website: "https://xellbuy.com",
