@@ -8,12 +8,8 @@ export default function SiteFooter() {
     <footer className="site-footer">
       <div className="footer-inner">
         <div className="footer-brand">
-          <Link href="/" className="footer-logo">
-            <span className="footer-logo-mark">X</span>
-            <span>
-              <span className="footer-logo-xell">XELL</span>
-              <span className="footer-logo-buy">BUY</span>
-            </span>
+          <Link href="/" className="footer-logo" aria-label="Xellbuy home">
+            <img src="/images/xellbuy-logo-transparent-light.png" alt="Xellbuy" className="footer-logo-img" width={335} height={512} />
           </Link>
           <p className="footer-tagline">
             India-first women&apos;s fashion by {COMPANY.name} — dresses, ethnic wear, denim and everyday essentials with clear INR pricing.

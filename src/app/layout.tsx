@@ -5,11 +5,14 @@ import { Toaster } from "sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Xellbuy — Skincare, Haircare, Makeup & Fragrance",
-  description: "Beauty & personal care e-commerce store — skincare, haircare, makeup and fragrance",
+  title: "Xellbuy — Women's Fashion",
+  description: "India-first women's fashion — dresses, ethnic wear, denim and everyday essentials with clear INR pricing.",
   icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    apple: "/icon.svg",
+    icon: [
+      { url: "/icon.png", type: "image/png", sizes: "64x64" },
+      { url: "/favicon.png", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
 };
 

@@ -149,7 +149,7 @@ export default function AdminDashboard() {
       <div className="admin-shell">
         <div className="sidebar">
           <div className="brand">
-            <span>MY</span>SKYBUY
+            <img src="/images/xellbuy-logo-transparent-light.png" alt="Xellbuy" className="admin-logo-img" />
           </div>
           {["products", "categories", "coupons", "banner", "orders", "customers"].map((t) => (
             <a key={t} className={`nav-link ${tab === t ? "active" : ""}`} onClick={() => switchTab(t)}>

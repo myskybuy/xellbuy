@@ -34,12 +34,8 @@ export default function SiteHeader({ showSearch = true }: { showSearch?: boolean
   return (
     <header className="site-header">
       <div className="header-top">
-        <Link href="/" className="logo" onClick={() => setNavOpen(false)}>
-          <span className="logo-mark">X</span>
-          <span className="logo-word">
-            <span className="logo-my">XELL</span>
-            <span className="logo-skybuy">BUY</span>
-          </span>
+        <Link href="/" className="logo" onClick={() => setNavOpen(false)} aria-label="Xellbuy home">
+          <img src="/images/xellbuy-logo-transparent.png" alt="Xellbuy" className="logo-img" width={335} height={512} />
         </Link>
 
         {showSearch ? (

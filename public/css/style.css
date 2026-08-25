@@ -61,35 +61,15 @@ header.site-header {
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-family: var(--font-body);
-  font-weight: 800;
-  font-size: 18px;
-  letter-spacing: 0.4px;
   flex-shrink: 0;
+  line-height: 0;
 }
-.logo-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 11px;
-  background: linear-gradient(145deg, var(--color-primary), var(--color-primary-dark));
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-size: 16px;
-  font-weight: 800;
-  box-shadow: 0 6px 16px rgba(var(--color-primary-rgb), 0.28);
+.logo-img {
+  height: 80px;
+  width: auto;
+  display: block;
+  object-fit: contain;
 }
-.logo-word { display: flex; align-items: baseline; gap: 2px; }
-.logo .logo-my {
-  background: transparent;
-  color: var(--color-primary);
-  padding: 0;
-  border-radius: 0;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-}
-.logo .logo-skybuy { color: var(--color-text); letter-spacing: 0.8px; }
 
 .search-wrap {
   position: relative;
@@ -1005,23 +985,15 @@ footer.site-footer {
 .footer-logo {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
   margin-bottom: 14px;
-  font-weight: 800;
-  letter-spacing: 0.6px;
+  line-height: 0;
 }
-.footer-logo-mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(145deg, var(--color-primary), var(--color-accent));
-  color: #fff;
-  font-size: 15px;
+.footer-logo-img {
+  height: 120px;
+  width: auto;
+  display: block;
+  object-fit: contain;
 }
-.footer-logo-xell { color: #5eead4; }
-.footer-logo-buy { color: #fff; }
 .footer-tagline {
   margin: 0 0 18px;
   font-size: 14px;
@@ -1284,6 +1256,15 @@ footer.site-footer {
   text-transform: uppercase;
   color: #5eead4;
 }
+.auth-aside-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  object-fit: cover;
+  display: block;
+  margin: 0 0 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
 .auth-aside h1 {
   margin: 0 0 12px;
   font-size: 30px;
@@ -1435,7 +1416,7 @@ footer.site-footer {
   .footer-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
   .header-top { padding: 10px 12px; gap: 10px; }
   .search-submit { padding: 8px 12px; font-size: 12px; }
-  .logo-word { font-size: 16px; }
+  .logo-img { height: 64px; }
   .cart-page, .account-page { padding: 28px 16px; }
   .section { padding: 40px 16px; }
   .cart-item { gap: 12px; }

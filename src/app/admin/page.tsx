@@ -28,7 +28,7 @@ export default function AdminLoginPage() {
       <div className="login-shell">
         <form className="login-box" onSubmit={onSubmit}>
           <div className="brand">
-            <span>MY</span>SKYBUY
+            <img src="/images/xellbuy-logo-transparent-light.png" alt="Xellbuy" className="admin-logo-img" />
           </div>
           <h1>Admin Login</h1>
           <div className="form-row">

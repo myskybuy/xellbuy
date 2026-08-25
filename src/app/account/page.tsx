@@ -176,6 +176,7 @@ export default function AccountPage() {
         <div className="auth-shell">
           <aside className="auth-aside">
             <p className="auth-aside-kicker">Xellbuy account</p>
+            <img src="/images/xellbuy-mark.png" alt="" className="auth-aside-mark" width={56} height={56} />
             <h1>Welcome back to clearer fashion shopping.</h1>
             <p>Log in for orders and checkout, or create an account in under a minute.</p>
             <ul className="auth-aside-list">

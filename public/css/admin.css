@@ -30,6 +30,13 @@ a { color: inherit; text-decoration: none; }
   border-radius: 12px;
   width: 340px;
 }
+.login-box .brand { margin-bottom: 18px; line-height: 0; }
+.admin-logo-img {
+  height: 96px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
 .login-box h1 { font-size: 22px; margin-bottom: 4px; }
 .login-box p { color: var(--a-muted); font-size: 13.5px; margin-bottom: 24px; }
 .login-box input {
@@ -49,8 +56,8 @@ a { color: inherit; text-decoration: none; }
   width: 220px; background: var(--a-surface); border-right: 1px solid var(--a-border);
   padding: 24px 16px; display: flex; flex-direction: column;
 }
-.sidebar .brand { font-size: 19px; font-weight: 700; margin-bottom: 30px; padding-left: 8px; }
-.sidebar .brand span { color: var(--a-accent); }
+.sidebar .brand { margin-bottom: 30px; padding-left: 4px; line-height: 0; }
+.sidebar .admin-logo-img { height: 88px; }
 .sidebar a.nav-link {
   display: block; padding: 11px 12px; border-radius: 8px; font-size: 14px; font-weight: 500;
   color: var(--a-muted); margin-bottom: 4px; cursor: pointer;
