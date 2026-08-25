@@ -1,19 +1,20 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import ForgotPasswordStep from "@/components/ForgotPasswordStep";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import StoreShell from "@/components/StoreShell";
 import { useAuth } from "@/components/AuthProvider";
 
-type Order = { id: number; total: number; status: string; createdAt: string; items: unknown[] };
-
 export default function AccountPage() {
-  const { user, setUser, clearUser, refreshUser } = useAuth();
+  const router = useRouter();
+  const { user, setUser, loading: authLoading } = useAuth();
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [step, setStep] = useState<"form" | "otp">("form");
+  const [showForgot, setShowForgot] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [signupName, setSignupName] = useState("");
@@ -26,19 +27,12 @@ export default function AccountPage() {
   const [signupError, setSignupError] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendIn, setResendIn] = useState(0);
-  const [orders, setOrders] = useState<Order[]>([]);
 
   const AUTH_FETCH: RequestInit = { credentials: "include" };
 
-  async function loadOrders() {
-    const data = await fetch("/api/account/orders", AUTH_FETCH).then((r) => r.json());
-    setOrders(Array.isArray(data) ? data : []);
-  }
-
   useEffect(() => {
-    if (user) loadOrders();
-    else setOrders([]);
-  }, [user]);
+    if (!authLoading && user) router.replace("/profile");
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     if (resendIn <= 0) return;
@@ -94,7 +88,6 @@ export default function AccountPage() {
       const data = await res.json().catch(() => ({}));
       if (data.success) {
         if (data.user) setUser(data.user);
-        else await refreshUser();
         toast.success("Logged in successfully");
         window.location.assign("/profile");
         return;
@@ -126,7 +119,7 @@ export default function AccountPage() {
           toast.warning(data.warning);
         } else {
           setOtpNotice(`A new OTP has been sent to ${otpEmail}.`);
-          toast.success("Code resent");
+          toast.success("OTP resent");
         }
       } else {
         const msg = data.error || "Could not resend OTP";
@@ -164,48 +157,12 @@ export default function AccountPage() {
     }
   }
 
-  async function doLogout() {
-    await fetch("/api/auth/logout", { ...AUTH_FETCH, method: "POST" });
-    clearUser();
-    setOrders([]);
-    toast.success("Logged out");
-  }
-
-  if (user) {
+  if (authLoading || user) {
     return (
       <StoreShell>
         <SiteHeader showSearch={false} />
         <div className="cart-page">
-          <h2>My Account</h2>
-          <div className="cart-summary" style={{ marginBottom: 28 }}>
-            <div style={{ fontWeight: 700, fontSize: 16 }}>{user.name}</div>
-            <div style={{ color: "var(--color-muted)", fontSize: 14 }}>{user.email}</div>
-            <Link href="/profile" className="btn btn-outline" style={{ marginTop: 16, marginRight: 10, display: "inline-block" }}>
-              View profile
-            </Link>
-            <button className="btn btn-outline" style={{ marginTop: 16, border: "1px solid var(--color-border)" }} onClick={doLogout}>
-              Log out
-            </button>
-          </div>
-          <h2 style={{ fontSize: 20 }}>My Orders</h2>
-          {orders.length ? (
-            orders.map((o) => (
-              <div key={o.id} className="order-card">
-                <div className="order-head">
-                  <span>Order #{o.id}</span>
-                  <span className={`status-tag ${o.status}`}>{o.status}</span>
-                </div>
-                <div style={{ color: "var(--color-muted)", fontSize: 13.5, marginBottom: 6 }}>
-                  {new Date(o.createdAt).toLocaleDateString()} • {Array.isArray(o.items) ? o.items.length : 0} item(s)
-                </div>
-                <div style={{ fontWeight: 700 }}>₹{o.total}</div>
-              </div>
-            ))
-          ) : (
-            <p style={{ color: "var(--color-muted)" }}>
-              No orders yet. <Link href="/shop">Start shopping →</Link>
-            </p>
-          )}
+          <p>Loading…</p>
         </div>
         <SiteFooter />
       </StoreShell>
@@ -215,99 +172,134 @@ export default function AccountPage() {
   return (
     <StoreShell>
       <SiteHeader showSearch={false} />
-      <div className="account-page">
-        <h2>My Account</h2>
+      <div className="auth-page">
+        <div className="auth-shell">
+          <aside className="auth-aside">
+            <p className="auth-aside-kicker">Xellbuy account</p>
+            <h1>Welcome back to clearer fashion shopping.</h1>
+            <p>Log in for orders and checkout, or create an account in under a minute.</p>
+            <ul className="auth-aside-list">
+              <li>Track orders in one place</li>
+              <li>Faster COD / online checkout</li>
+              <li>Email OTP for secure login</li>
+            </ul>
+          </aside>
 
-        {step === "otp" ? (
-          <div>
-            <p className="account-note" style={{ marginBottom: 16 }}>
-              {otpNotice}
-            </p>
-            <div className="form-group">
-              <label>Enter OTP</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                placeholder="6-digit code"
-                style={{ letterSpacing: "6px", textAlign: "center", fontSize: "18px", fontWeight: 700 }}
-              />
-            </div>
-            <button className="btn btn-accent" style={{ width: "100%" }} onClick={doVerifyOtp} disabled={loading || otp.length !== 6}>
-              {loading ? "Verifying…" : "Verify & Log in"}
-            </button>
-            {loginError ? <p className="account-error">{loginError}</p> : null}
-            <p className="account-note">
-              Didn&apos;t get the code?{" "}
-              <button type="button" className="auth-modal-link" onClick={doResendOtp} disabled={loading || resendIn > 0}>
-                {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend OTP"}
-              </button>
-            </p>
-            <p className="account-note">
-              <button
-                type="button"
-                className="auth-modal-link"
-                onClick={() => {
-                  setStep("form");
-                  setOtp("");
-                  setLoginError("");
-                }}
-              >
-                ← Back to login
-              </button>
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="account-tabs">
-              <button className={tab === "login" ? "active" : ""} onClick={() => setTab("login")}>
-                Log in
-              </button>
-              <button className={tab === "signup" ? "active" : ""} onClick={() => setTab("signup")}>
-                Sign up
-              </button>
-            </div>
-
-            {tab === "login" ? (
-              <div>
+          <div className="auth-panel">
+            {step === "otp" ? (
+              <div className="auth-panel-body">
+                <h2>Verify it&apos;s you</h2>
+                <p className="auth-panel-lead">{otpNotice}</p>
                 <div className="form-group">
-                  <label>Email</label>
-                  <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="you@example.com" />
+                  <label>Enter OTP</label>
+                  <input
+                    className="otp-input"
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                    placeholder="••••••"
+                  />
                 </div>
-                <div className="form-group">
-                  <label>Password</label>
-                  <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Your password" />
-                </div>
-                <button className="btn btn-accent" style={{ width: "100%" }} onClick={doLogin} disabled={loading}>
-                  {loading ? "Please wait…" : "Log in"}
+                <button className="btn btn-accent auth-submit" onClick={doVerifyOtp} disabled={loading || otp.length !== 6}>
+                  {loading ? "Verifying…" : "Verify & Log in"}
                 </button>
-                <p className="account-note">We&apos;ll email you a one-time code to verify it&apos;s you.</p>
                 {loginError ? <p className="account-error">{loginError}</p> : null}
+                <p className="account-note">
+                  Didn&apos;t get the code?{" "}
+                  <button type="button" className="auth-modal-link" onClick={doResendOtp} disabled={loading || resendIn > 0}>
+                    {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend OTP"}
+                  </button>
+                </p>
+                <p className="account-note">
+                  <button
+                    type="button"
+                    className="auth-modal-link"
+                    onClick={() => {
+                      setStep("form");
+                      setOtp("");
+                      setLoginError("");
+                    }}
+                  >
+                    ← Back to login
+                  </button>
+                </p>
               </div>
             ) : (
-              <div>
-                <div className="form-group">
-                  <label>Full name</label>
-                  <input type="text" value={signupName} onChange={(e) => setSignupName(e.target.value)} placeholder="Your name" />
-                </div>
-                <div className="form-group">
-                  <label>Email</label>
-                  <input type="email" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} placeholder="you@example.com" />
-                </div>
-                <div className="form-group">
-                  <label>Password</label>
-                  <input type="password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} placeholder="At least 6 characters" />
-                </div>
-                <button className="btn btn-accent" style={{ width: "100%" }} onClick={doSignup} disabled={loading}>
-                  {loading ? "Please wait…" : "Create account"}
-                </button>
-                {signupError ? <p className="account-error">{signupError}</p> : null}
+              <div className="auth-panel-body">
+                {showForgot ? (
+                  <>
+                    <h2>Reset password</h2>
+                    <ForgotPasswordStep
+                      onDone={(u) => {
+                        setUser(u);
+                        setShowForgot(false);
+                        window.location.assign("/profile");
+                      }}
+                      onBack={() => setShowForgot(false)}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <h2>My Account</h2>
+                    <p className="auth-panel-lead">Sign in or create a new Xellbuy account.</p>
+                    <div className="account-tabs">
+                      <button type="button" className={tab === "login" ? "active" : ""} onClick={() => setTab("login")}>
+                        Log in
+                      </button>
+                      <button type="button" className={tab === "signup" ? "active" : ""} onClick={() => setTab("signup")}>
+                        Sign up
+                      </button>
+                    </div>
+
+                    {tab === "login" ? (
+                      <div>
+                        <div className="form-group">
+                          <label>Email</label>
+                          <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="you@example.com" />
+                        </div>
+                        <div className="form-group">
+                          <label>Password</label>
+                          <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Your password" />
+                        </div>
+                        <p className="auth-forgot-row">
+                          <button type="button" className="auth-modal-link" onClick={() => setShowForgot(true)}>
+                            Forgot password?
+                          </button>
+                        </p>
+                        <button className="btn btn-accent auth-submit" onClick={doLogin} disabled={loading}>
+                          {loading ? "Please wait…" : "Continue"}
+                        </button>
+                        <p className="account-note">We&apos;ll email a one-time code to verify it&apos;s you.</p>
+                        {loginError ? <p className="account-error">{loginError}</p> : null}
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="form-group">
+                          <label>Full name</label>
+                          <input type="text" value={signupName} onChange={(e) => setSignupName(e.target.value)} placeholder="Your name" />
+                        </div>
+                        <div className="form-group">
+                          <label>Email</label>
+                          <input type="email" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} placeholder="you@example.com" />
+                        </div>
+                        <div className="form-group">
+                          <label>Password</label>
+                          <input type="password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} placeholder="At least 6 characters" />
+                        </div>
+                        <button className="btn btn-accent auth-submit" onClick={doSignup} disabled={loading}>
+                          {loading ? "Please wait…" : "Create account"}
+                        </button>
+                        {signupError ? <p className="account-error">{signupError}</p> : null}
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             )}
-          </>
-        )}
+          </div>
+        </div>
       </div>
       <SiteFooter />
     </StoreShell>

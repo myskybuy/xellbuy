@@ -133,7 +133,7 @@ export default function CheckoutPage() {
           }
         },
         prefill: { name, email, contact: phone },
-        theme: { color: "#9c2d4a" },
+        theme: { color: "#0f766e" },
       });
       rzp.open();
       return;

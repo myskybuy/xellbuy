@@ -6,6 +6,16 @@ import { FormEvent, useState } from "react";
 import { useAuth } from "./AuthProvider";
 import { useCart } from "./CartProvider";
 
+const NAV = [
+  { href: "/shop?category=Dresses", label: "Dresses" },
+  { href: "/shop?category=Tops", label: "Tops" },
+  { href: "/shop?category=Jeans", label: "Jeans" },
+  { href: "/shop?category=Sarees", label: "Sarees" },
+  { href: "/shop?category=Ethnic%20Wear", label: "Ethnic Wear" },
+  { href: "/shop?sale=1", label: "Price Drops" },
+  { href: "/about", label: "About" },
+];
+
 export default function SiteHeader({ showSearch = true }: { showSearch?: boolean }) {
   const router = useRouter();
   const { cartCount } = useCart();
@@ -23,7 +33,7 @@ export default function SiteHeader({ showSearch = true }: { showSearch?: boolean
 
   return (
     <header className="site-header">
-      <div className="header-inner">
+      <div className="header-top">
         <Link href="/" className="logo" onClick={() => setNavOpen(false)}>
           <span className="logo-mark">X</span>
           <span className="logo-word">
@@ -33,7 +43,7 @@ export default function SiteHeader({ showSearch = true }: { showSearch?: boolean
         </Link>
 
         {showSearch ? (
-          <form onSubmit={onSearch} className="search-wrap">
+          <form onSubmit={onSearch} className="search-wrap" role="search">
             <span className="search-icon" aria-hidden>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="7" />
@@ -42,63 +52,64 @@ export default function SiteHeader({ showSearch = true }: { showSearch?: boolean
             </span>
             <input
               className="search-box"
-              placeholder="Search skincare, makeup, haircare…"
+              placeholder="Search dresses, tops, sarees…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search products"
             />
+            <button type="submit" className="search-submit" disabled={!query.trim()}>
+              Search
+            </button>
           </form>
-        ) : null}
-
-        <button
-          type="button"
-          className={`nav-toggle ${navOpen ? "open" : ""}`}
-          aria-label={navOpen ? "Close menu" : "Open menu"}
-          aria-expanded={navOpen}
-          onClick={() => setNavOpen((v) => !v)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-
-        <nav className={`main-nav ${navOpen ? "open" : ""}`}>
-          <Link href="/shop?category=Skincare" onClick={() => setNavOpen(false)}>
-            Skincare
-          </Link>
-          <Link href="/shop?category=Haircare" onClick={() => setNavOpen(false)}>
-            Haircare
-          </Link>
-          <Link href="/shop?category=Makeup" onClick={() => setNavOpen(false)}>
-            Makeup
-          </Link>
-          <Link href="/shop?category=Bath%20%26%20Body" onClick={() => setNavOpen(false)}>
-            Bath &amp; Body
-          </Link>
-          <Link href="/shop?category=Fragrance" onClick={() => setNavOpen(false)}>
-            Fragrance
-          </Link>
-          <Link href="/shop?sale=1" onClick={() => setNavOpen(false)}>
-            Price Drops
-          </Link>
-          <Link href="/about" onClick={() => setNavOpen(false)}>
-            About Us
-          </Link>
-        </nav>
+        ) : (
+          <div className="search-wrap search-wrap--empty" aria-hidden />
+        )}
 
         <div className="header-actions">
-          <Link href={user ? "/profile" : "/account"} className="profile-link" title={user ? "My profile" : "Login / Sign up"}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+          <Link
+            href={user ? "/profile" : "/account"}
+            className="header-icon-btn"
+            title={user ? "My profile" : "Login / Sign up"}
+            aria-label={user ? "My profile" : "Login or sign up"}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+              <circle cx="12" cy="8" r="3.5" />
+              <path d="M5 19.5c0-3.4 3.1-6 7-6s7 2.6 7 6" />
             </svg>
-            <span className="profile-label">{user ? user.name.split(" ")[0] : "Account"}</span>
+            <span className="header-icon-label">{user ? user.name.split(" ")[0] : "Account"}</span>
           </Link>
-          <Link href="/cart" className="cart-pill">
-            Cart ({cartCount})
+
+          <Link href="/cart" className="header-icon-btn cart-icon-btn" aria-label={`Cart, ${cartCount} items`}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+              <path d="M6 6h15l-1.5 9h-12z" />
+              <path d="M6 6l-1-3H2" />
+              <circle cx="9" cy="20" r="1.4" fill="currentColor" stroke="none" />
+              <circle cx="17" cy="20" r="1.4" fill="currentColor" stroke="none" />
+            </svg>
+            {cartCount > 0 ? <span className="cart-badge">{cartCount > 99 ? "99+" : cartCount}</span> : null}
           </Link>
+
+          <button
+            type="button"
+            className={`nav-toggle ${navOpen ? "open" : ""}`}
+            aria-label={navOpen ? "Close menu" : "Open menu"}
+            aria-expanded={navOpen}
+            onClick={() => setNavOpen((v) => !v)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
         </div>
       </div>
+
+      <nav className={`main-nav ${navOpen ? "open" : ""}`} aria-label="Primary">
+        {NAV.map((item) => (
+          <Link key={item.href} href={item.href} onClick={() => setNavOpen(false)}>
+            {item.label}
+          </Link>
+        ))}
+      </nav>
     </header>
   );
 }

@@ -2,7 +2,13 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-export type AuthUser = { id: number; name: string; email: string };
+export type AuthUser = {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+};
 
 type AuthContextValue = {
   user: AuthUser | null;

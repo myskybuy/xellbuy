@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth, type AuthUser } from "./AuthProvider";
+import ForgotPasswordStep from "./ForgotPasswordStep";
 
 type AuthModalProps = {
   open: boolean;
@@ -22,6 +23,7 @@ export default function AuthModal({
   const { setUser } = useAuth();
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [step, setStep] = useState<"form" | "otp">("form");
+  const [showForgot, setShowForgot] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [signupName, setSignupName] = useState("");
@@ -50,6 +52,7 @@ export default function AuthModal({
     setError("");
     setNotice("");
     setResendIn(0);
+    setShowForgot(false);
   }
 
   async function handleLogin(e: FormEvent) {
@@ -176,7 +179,7 @@ export default function AuthModal({
 
   return (
     <div className="auth-modal-overlay" role="dialog" aria-modal="true">
-      <div className="auth-modal">
+      <div className="auth-modal auth-modal--panel">
         {onClose ? (
           <button type="button" className="auth-modal-close" onClick={onClose} aria-label="Close">
             ×
@@ -184,25 +187,25 @@ export default function AuthModal({
         ) : null}
 
         {step === "otp" ? (
-          <>
+          <div className="auth-panel-body">
             <h2>Verify your email</h2>
-            <p className="auth-modal-msg">{notice}</p>
+            <p className="auth-panel-lead">{notice}</p>
             <form onSubmit={handleVerifyOtp}>
               <div className="form-group">
                 <label>Enter OTP</label>
                 <input
+                  className="otp-input"
                   type="text"
                   inputMode="numeric"
                   autoFocus
                   maxLength={6}
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                  placeholder="6-digit code"
+                  placeholder="••••••"
                   required
-                  style={{ letterSpacing: "6px", textAlign: "center", fontSize: "18px", fontWeight: 700 }}
                 />
               </div>
-              <button className="btn btn-accent" style={{ width: "100%" }} type="submit" disabled={loading || otp.length !== 6}>
+              <button className="btn btn-accent auth-submit" type="submit" disabled={loading || otp.length !== 6}>
                 {loading ? "Verifying…" : "Verify & Log in"}
               </button>
             </form>
@@ -218,55 +221,97 @@ export default function AuthModal({
               </button>
             </p>
             {error ? <p className="auth-modal-error">{error}</p> : null}
-          </>
+          </div>
         ) : (
-          <>
-            <h2>{title}</h2>
-            <p className="auth-modal-msg">{message}</p>
-            <div className="account-tabs">
-              <button type="button" className={tab === "login" ? "active" : ""} onClick={() => { setTab("login"); setError(""); }}>
-                Log in
-              </button>
-              <button type="button" className={tab === "signup" ? "active" : ""} onClick={() => { setTab("signup"); setError(""); }}>
-                Sign up
-              </button>
-            </div>
-            {tab === "login" ? (
-              <form onSubmit={handleLogin}>
-                <div className="form-group">
-                  <label>Email</label>
-                  <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="you@example.com" required />
-                </div>
-                <div className="form-group">
-                  <label>Password</label>
-                  <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Your password" required />
-                </div>
-                <button className="btn btn-accent" style={{ width: "100%" }} type="submit" disabled={loading}>
-                  {loading ? "Please wait…" : "Log in"}
-                </button>
-                <p className="account-note">We&apos;ll email you a one-time code to verify it&apos;s you.</p>
-              </form>
+          <div className="auth-panel-body">
+            {showForgot ? (
+              <>
+                <h2>Reset password</h2>
+                <ForgotPasswordStep
+                  onDone={(u) => {
+                    setUser(u);
+                    setShowForgot(false);
+                    onSuccess(u);
+                  }}
+                  onBack={() => setShowForgot(false)}
+                />
+              </>
             ) : (
-              <form onSubmit={handleSignup}>
-                <div className="form-group">
-                  <label>Full name</label>
-                  <input type="text" value={signupName} onChange={(e) => setSignupName(e.target.value)} placeholder="Your name" required />
+              <>
+                <h2>{title}</h2>
+                <p className="auth-panel-lead">{message}</p>
+                <div className="account-tabs">
+                  <button
+                    type="button"
+                    className={tab === "login" ? "active" : ""}
+                    onClick={() => {
+                      setTab("login");
+                      setError("");
+                    }}
+                  >
+                    Log in
+                  </button>
+                  <button
+                    type="button"
+                    className={tab === "signup" ? "active" : ""}
+                    onClick={() => {
+                      setTab("signup");
+                      setError("");
+                    }}
+                  >
+                    Sign up
+                  </button>
                 </div>
-                <div className="form-group">
-                  <label>Email</label>
-                  <input type="email" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} placeholder="you@example.com" required />
-                </div>
-                <div className="form-group">
-                  <label>Password</label>
-                  <input type="password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} placeholder="At least 6 characters" required minLength={6} />
-                </div>
-                <button className="btn btn-accent" style={{ width: "100%" }} type="submit" disabled={loading}>
-                  {loading ? "Please wait…" : "Create account"}
-                </button>
-              </form>
+                {tab === "login" ? (
+                  <form onSubmit={handleLogin}>
+                    <div className="form-group">
+                      <label>Email</label>
+                      <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="you@example.com" required />
+                    </div>
+                    <div className="form-group">
+                      <label>Password</label>
+                      <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Your password" required />
+                    </div>
+                    <p className="auth-forgot-row">
+                      <button type="button" className="auth-modal-link" onClick={() => setShowForgot(true)}>
+                        Forgot password?
+                      </button>
+                    </p>
+                    <button className="btn btn-accent auth-submit" type="submit" disabled={loading}>
+                      {loading ? "Please wait…" : "Continue"}
+                    </button>
+                    <p className="account-note">We&apos;ll email a one-time code to verify it&apos;s you.</p>
+                  </form>
+                ) : (
+                  <form onSubmit={handleSignup}>
+                    <div className="form-group">
+                      <label>Full name</label>
+                      <input type="text" value={signupName} onChange={(e) => setSignupName(e.target.value)} placeholder="Your name" required />
+                    </div>
+                    <div className="form-group">
+                      <label>Email</label>
+                      <input type="email" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} placeholder="you@example.com" required />
+                    </div>
+                    <div className="form-group">
+                      <label>Password</label>
+                      <input
+                        type="password"
+                        value={signupPassword}
+                        onChange={(e) => setSignupPassword(e.target.value)}
+                        placeholder="At least 6 characters"
+                        required
+                        minLength={6}
+                      />
+                    </div>
+                    <button className="btn btn-accent auth-submit" type="submit" disabled={loading}>
+                      {loading ? "Please wait…" : "Create account"}
+                    </button>
+                  </form>
+                )}
+                {error ? <p className="auth-modal-error">{error}</p> : null}
+              </>
             )}
-            {error ? <p className="auth-modal-error">{error}</p> : null}
-          </>
+          </div>
         )}
       </div>
     </div>

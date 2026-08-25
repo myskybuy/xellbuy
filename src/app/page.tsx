@@ -8,21 +8,14 @@ import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import StoreShell from "@/components/StoreShell";
 
-const heroAllowedCategories = ["Skincare", "Haircare", "Makeup", "Bath & Body", "Fragrance"];
-
-const CATEGORY_ICONS: Record<string, string> = {
-  Skincare: "🧴",
-  Haircare: "💇‍♀️",
-  Makeup: "💄",
-  "Bath & Body": "🧼",
-  Fragrance: "🌸",
-};
+const heroAllowedCategories = ["Dresses", "Tops", "Jeans", "Sarees", "Ethnic Wear", "Blouses", "Skirts"];
 
 export default function HomePage() {
   const [categories, setCategories] = useState<Array<{ id: number; name: string; image: string }>>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [heroProducts, setHeroProducts] = useState<Product[]>([]);
   const [heroIndex, setHeroIndex] = useState(0);
+  const [heroPaused, setHeroPaused] = useState(false);
 
   useEffect(() => {
     fetch("/api/categories")
@@ -32,126 +25,127 @@ export default function HomePage() {
       .then((r) => r.json())
       .then((data: Product[]) => {
         setProducts(data);
-        setHeroProducts(data.filter((p) => heroAllowedCategories.includes(p.category) && p.image).slice(0, 8));
+        const withImage = data.filter((p) => p.image && !p.image.includes("placeholder"));
+        const preferred = withImage.filter((p) => heroAllowedCategories.includes(p.category));
+        setHeroProducts((preferred.length ? preferred : withImage).slice(0, 8));
       });
   }, []);
 
   useEffect(() => {
-    if (!heroProducts.length) return;
-    const timer = setInterval(() => setHeroIndex((i) => (i + 1) % heroProducts.length), 4000);
+    if (!heroProducts.length || heroPaused) return;
+    const timer = setInterval(() => setHeroIndex((i) => (i + 1) % heroProducts.length), 5200);
     return () => clearInterval(timer);
-  }, [heroProducts.length]);
+  }, [heroProducts.length, heroPaused]);
 
   const currentHero = heroProducts[heroIndex];
+  const lookLabel = currentHero
+    ? `${String(heroIndex + 1).padStart(2, "0")} / ${String(heroProducts.length).padStart(2, "0")}`
+    : null;
 
   return (
     <>
       <FestivePopup />
-      <StoreShell
-        topBar={
-          <div className="top-bar">
-            Beauty essentials across India &nbsp;•&nbsp; Clear INR pricing &nbsp;•&nbsp; Cash on Delivery
-          </div>
-        }
-      >
+      <StoreShell>
         <SiteHeader />
 
-        <section className="hero">
-          <div className="hero-inner">
-            <div className="hero-copy">
-              <p className="hero-kicker">Xellbuy beauty catalogue</p>
+        <section
+          className="hero hero--fashion"
+          onMouseEnter={() => setHeroPaused(true)}
+          onMouseLeave={() => setHeroPaused(false)}
+        >
+          <div className="hero-stage">
+            {heroProducts.length ? (
+              heroProducts.map((product, index) => {
+                const active = index === heroIndex;
+                return (
+                  <div
+                    key={product.id}
+                    className={`hero-stage-slide ${active ? "active" : ""}`}
+                    aria-hidden={!active}
+                  >
+                    <img
+                      src={product.image}
+                      alt=""
+                      className="hero-stage-img"
+                      loading={index === 0 ? "eager" : "lazy"}
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              <div className="hero-stage-slide active hero-stage-slide--empty" />
+            )}
+            <div className="hero-stage-shade" aria-hidden />
+            <div className="hero-stage-grain" aria-hidden />
+
+            <div className="hero-stage-content" key={heroIndex}>
+              <p className="hero-brand">Xellbuy</p>
               <h1>
-                Everyday glow,
-                <br />
-                <span className="accent">honestly priced.</span>
+                Women&apos;s fashion,
+                <span>cut clean.</span>
               </h1>
-              <p>
-                Curated skincare, haircare, makeup and fragrance — clear product listings, INR prices you can trust,
-                and Cash on Delivery across India.
+              <p className="hero-lead">
+                Dresses, ethnic wear and denim — honest ₹ prices, COD across India.
               </p>
               <div className="hero-actions">
                 <Link href="/shop" className="btn btn-accent">
                   Shop the edit
                 </Link>
-                <Link href="/shop?sale=1" className="btn btn-outline">
-                  View price drops
+                <Link href="/shop?category=Dresses" className="btn btn-ghost">
+                  Dresses
                 </Link>
               </div>
-              <div className="hero-stats">
-                <div>
-                  <strong>60+</strong>
-                  <span>curated products</span>
-                </div>
-                <div>
-                  <strong>COD</strong>
-                  <span>pay on delivery</span>
-                </div>
-                <div>
-                  <strong>Transparent</strong>
-                  <span>₹ pricing · no surprises</span>
-                </div>
-              </div>
             </div>
-            <div className="hero-visual bag-carousel">
-              <span className="hero-edit-badge">This week&apos;s edit</span>
-              {currentHero ? (
-                <>
-                  <div id="hero-carousel">
-                    {heroProducts.map((product, index) => {
-                      const currentPrice = product.salePrice ?? product.price;
-                      return (
-                        <Link
-                          key={product.id}
-                          href={`/product/${product.id}`}
-                          className={`hero-slide ${index === heroIndex ? "active" : ""}`}
-                        >
-                          <div className="hero-slide-media">
-                            <img src={product.image} alt={product.name} loading={index === 0 ? "eager" : "lazy"} />
-                          </div>
-                          <div className="hero-product-info">
-                            <span>{product.brand || "Xellbuy"}</span>
-                            <strong>{product.name}</strong>
-                            <div className="hero-price">
-                              <b>₹{Number(currentPrice).toLocaleString("en-IN")}</b>
-                              {product.salePrice < product.price ? (
-                                <del>₹{Number(product.price).toLocaleString("en-IN")}</del>
-                              ) : null}
-                            </div>
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
+
+            {heroProducts.length > 1 ? (
+              <div className="hero-rail">
+                <div className="hero-rail-meta">
+                  <span className="hero-look-num">{lookLabel}</span>
+                  {currentHero ? (
+                    <Link href={`/product/${currentHero.id}`} className="hero-look-link">
+                      View look
+                    </Link>
+                  ) : null}
+                </div>
+                <div
+                  className={`hero-progress ${heroPaused ? "is-paused" : ""}`}
+                  key={`progress-${heroIndex}`}
+                  aria-hidden
+                />
+                <div className="hero-controls">
                   <button
-                    className="carousel-btn carousel-prev"
                     type="button"
-                    aria-label="Previous product"
+                    className="hero-nav-btn"
+                    aria-label="Previous look"
                     onClick={() => setHeroIndex((i) => (i - 1 + heroProducts.length) % heroProducts.length)}
                   >
                     ‹
                   </button>
+                  <div className="hero-thumbs">
+                    {heroProducts.map((product, index) => (
+                      <button
+                        key={product.id}
+                        type="button"
+                        className={`hero-thumb ${index === heroIndex ? "active" : ""}`}
+                        aria-label={`Look ${index + 1}`}
+                        aria-current={index === heroIndex}
+                        onClick={() => setHeroIndex(index)}
+                      >
+                        <img src={product.image} alt="" />
+                      </button>
+                    ))}
+                  </div>
                   <button
-                    className="carousel-btn carousel-next"
                     type="button"
-                    aria-label="Next product"
+                    className="hero-nav-btn"
+                    aria-label="Next look"
                     onClick={() => setHeroIndex((i) => (i + 1) % heroProducts.length)}
                   >
                     ›
                   </button>
-                  <div className="carousel-dots">
-                    {heroProducts.map((_, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        className={index === heroIndex ? "active" : ""}
-                        aria-label={`Go to product ${index + 1}`}
-                        onClick={() => setHeroIndex(index)}
-                      />
-                    ))}
-                  </div>
-                </>
-              ) : null}
-            </div>
+                </div>
+              </div>
+            ) : null}
           </div>
         </section>
 
@@ -160,7 +154,7 @@ export default function HomePage() {
             <div className="section-head">
               <div>
                 <div className="eyebrow">Shop by category</div>
-                <h2>Find your everyday routine</h2>
+                <h2>Find your next look</h2>
               </div>
             </div>
             <div className="category-cards">
@@ -171,11 +165,16 @@ export default function HomePage() {
                   href={`/shop?category=${encodeURIComponent(c.name)}`}
                 >
                   <div className="cc-thumb">
-                    <span className="cc-icon" aria-hidden>
-                      {CATEGORY_ICONS[c.name] || "✨"}
-                    </span>
+                    {c.image ? (
+                      <img src={c.image} alt="" className="cc-img" />
+                    ) : (
+                      <span className="cc-initial" aria-hidden>
+                        {c.name.charAt(0)}
+                      </span>
+                    )}
+                    <span className="cc-shade" aria-hidden />
+                    <span className="cc-label">{c.name}</span>
                   </div>
-                  <div className="cc-name">{c.name}</div>
                 </Link>
               ))}
             </div>
@@ -187,7 +186,7 @@ export default function HomePage() {
             <div className="section-head">
               <div>
                 <div className="eyebrow">Freshly curated</div>
-                <h2>Featured products</h2>
+                <h2>Featured styles</h2>
               </div>
               <Link href="/shop">View all →</Link>
             </div>
@@ -196,10 +195,10 @@ export default function HomePage() {
         </section>
 
         <div className="cta-band">
-          <div className="eyebrow">Explore our beauty catalog</div>
-          <h2>Browse skincare, haircare, makeup and fragrance in one polished place.</h2>
+          <div className="eyebrow">Explore the catalogue</div>
+          <h2>Browse dresses, ethnic wear, denim and everyday essentials in one place.</h2>
           <Link href="/shop" className="btn btn-outline">
-            See all products →
+            See all styles →
           </Link>
         </div>
 

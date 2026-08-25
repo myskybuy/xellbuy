@@ -49,6 +49,8 @@ model User {
   id           Int      @id @default(autoincrement())
   name         String
   email        String   @unique
+  phone        String   @default("")
+  address      String   @default("") @db.Text
   passwordHash String
   createdAt    DateTime @default(now())
   orders       Order[]

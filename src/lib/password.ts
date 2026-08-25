@@ -27,6 +27,18 @@ export function normalizePhone(phone: string) {
   return digits.length > 10 ? digits.slice(-10) : digits;
 }
 
-export function publicUser(user: { id: number; name: string; email: string }) {
-  return { id: user.id, name: user.name, email: user.email };
+export function publicUser(user: {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string | null;
+  address?: string | null;
+}) {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone || "",
+    address: user.address || "",
+  };
 }

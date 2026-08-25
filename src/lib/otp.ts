@@ -1,8 +1,8 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/db";
-import { sendLoginOtpEmail } from "@/lib/email";
+import { sendLoginOtpEmail, sendPasswordResetEmail } from "@/lib/email";
 
-export type OtpPurpose = "signup" | "login";
+export type OtpPurpose = "signup" | "login" | "reset";
 
 const OTP_TTL_MS = 10 * 60 * 1000;
 const RESEND_MS = 60 * 1000;
@@ -27,7 +27,6 @@ export async function issueOtp(email: string, purpose: OtpPurpose) {
     orderBy: { createdAt: "desc" },
   });
 
-  // Reuse unexpired OTP inside resend window (avoid 429 + "old email code" confusion).
   if (
     recent &&
     recent.expiresAt.getTime() > Date.now() &&
@@ -51,12 +50,12 @@ export async function issueOtp(email: string, purpose: OtpPurpose) {
     },
   });
 
-  const mail = await sendLoginOtpEmail(cleanEmail, code);
+  const mail =
+    purpose === "reset" ? await sendPasswordResetEmail(cleanEmail, code) : await sendLoginOtpEmail(cleanEmail, code);
   if (!mail.sent) {
     if (mail.codeForDev) {
       return { ok: true as const, codeForDev: mail.codeForDev, warning: mail.error };
     }
-    // Don't leave an unverifiable OTP row if email failed.
     await prisma.otpCode.deleteMany({ where: { email: cleanEmail, purpose } });
     return {
       ok: false as const,

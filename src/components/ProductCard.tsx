@@ -41,31 +41,36 @@ export default function ProductCard({ product }: { product: Product }) {
   }
 
   const btnLabel =
-    feedback === "added" ? "Item added to cart" : inCart ? "In cart" : "Add to cart";
+    feedback === "added" ? "Added" : inCart ? "In cart" : "Add to cart";
 
   return (
-    <div className="product-card">
+    <article className="product-card">
       <Link href={`/product/${product.id}`} className="thumb">
-        {discount > 0 ? <span className="badge-sale">{discount}% OFF</span> : null}
-        <img src={product.image} alt={product.name} />
+        {discount > 0 ? <span className="badge-sale">-{discount}%</span> : null}
+        {product.category ? <span className="badge-cat">{product.category}</span> : null}
+        <img src={product.image} alt={product.name} loading="lazy" />
       </Link>
       <div className="info">
-        <span className="brand">{product.brand}</span>
-        <Link href={`/product/${product.id}`}>
+        <span className="brand">{product.brand || "Xellbuy"}</span>
+        <Link href={`/product/${product.id}`} className="name-link">
           <h3 className="name">{product.name}</h3>
         </Link>
-        <div className="price-row">
-          <span className="price-now">₹{product.salePrice}</span>
-          {product.price > product.salePrice ? <span className="price-old">₹{product.price}</span> : null}
+        <div className="product-card-footer">
+          <div className="price-row">
+            <span className="price-now">₹{product.salePrice.toLocaleString("en-IN")}</span>
+            {product.price > product.salePrice ? (
+              <span className="price-old">₹{product.price.toLocaleString("en-IN")}</span>
+            ) : null}
+          </div>
+          <button
+            className={`add-btn ${feedback === "added" ? "added" : ""} ${inCart && feedback === "idle" ? "in-cart" : ""}`}
+            onClick={handleAdd}
+            type="button"
+          >
+            {btnLabel}
+          </button>
         </div>
-        <button
-          className={`add-btn ${feedback === "added" ? "added" : ""} ${inCart && feedback === "idle" ? "in-cart" : ""}`}
-          onClick={handleAdd}
-          type="button"
-        >
-          {btnLabel}
-        </button>
       </div>
-    </div>
+    </article>
   );
 }

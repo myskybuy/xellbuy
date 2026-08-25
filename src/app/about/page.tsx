@@ -2,132 +2,163 @@ import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import StoreShell from "@/components/StoreShell";
+import { prisma } from "@/lib/db";
 import { COMPANY } from "@/lib/policies";
 
-const HERO_IMG = "/images/about/hero.svg";
-const WHO_IMG = "/images/about/who.svg";
+const FALLBACK = "/images/product-placeholder.svg";
 
-const categoryBlocks = [
+const categoryCopy: Array<{ key: string; title: string; text: string; href: string }> = [
   {
-    title: "Skincare",
-    text: "Everyday basics — cleansers, sunscreens, serums and moisturisers chosen for routines people will actually stick with, not 12-step regimens nobody has time for.",
-    icon: "🧴",
+    key: "Dresses",
+    title: "Dresses",
+    text: "Mini, midi and maxi silhouettes for everyday, parties and evenings.",
+    href: "/shop?category=Dresses",
   },
   {
-    title: "Haircare",
-    text: "Built around real concerns: frizz, dryness, hair fall, dullness — shampoos, oils, serums and masks that address one of those instead of promising to fix everything at once.",
-    icon: "💇‍♀️",
+    key: "Sarees",
+    title: "Sarees & Ethnic",
+    text: "Festive sarees, Anarkalis and occasion sets without catalogue noise.",
+    href: "/shop?category=Sarees",
   },
   {
-    title: "Makeup",
-    text: "Stays wearable. Lip, eye and face products in shades and finishes meant for daily use, not just for a one-time festival look that sits in a drawer afterward.",
-    icon: "💄",
+    key: "Tops",
+    title: "Tops & Blouses",
+    text: "Crops, blouses and tees that layer into work and weekend outfits.",
+    href: "/shop?category=Tops",
   },
   {
-    title: "Bath, Body & Fragrance",
-    text: "Body washes, lotions, deodorants and perfumes that make the rest of a self-care routine feel finished, not like an afterthought.",
-    icon: "🧼",
+    key: "Jeans",
+    title: "Denim & Essentials",
+    text: "Jeans, shirts and outerwear for everyday rotation.",
+    href: "/shop?category=Jeans",
   },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const products = await prisma.product.findMany({
+    where: { NOT: { image: { contains: "placeholder" } } },
+    orderBy: { id: "asc" },
+    take: 16,
+    select: { id: true, name: true, image: true, category: true },
+  });
+
+  const byCategory = (name: string) => products.find((p) => p.category === name)?.image || products[0]?.image || FALLBACK;
+
+  const heroMain = products[0]?.image || FALLBACK;
+  const heroSide = [products[1], products[2], products[4], products[8]].map((p) => p?.image || FALLBACK);
+  const pickImage = products[5]?.image || products[3]?.image || FALLBACK;
+
   return (
     <StoreShell>
       <SiteHeader />
 
-      <section className="about-hero">
-        <div className="container about-split">
+      <section className="about-hero about-hero--fashion">
+        <div className="container about-hero-grid">
           <div className="about-copy">
-            <p className="about-eyebrow gold">About Xellbuy</p>
-            <h1>Beauty shouldn&apos;t be complicated. We&apos;re here to make it simple.</h1>
+            <p className="about-eyebrow teal">About Xellbuy</p>
+            <h1>Women&apos;s fashion, clearly priced and carefully listed.</h1>
             <p className="about-lead">
-              Xellbuy exists because shopping for skincare and beauty online in India can feel oddly overwhelming —
-              hundreds of near-identical products, confusing ingredient claims, and no easy way to tell what&apos;s
-              actually worth your money. We built Xellbuy as the antidote to that: a tighter, more honest selection of
-              skincare, haircare, makeup and body-care essentials, picked because they work, not because they&apos;re
-              trending for a week.
+              Xellbuy is an India-first women&apos;s fashion catalogue — dresses, ethnic wear, denim and everyday
+              essentials — so you can see what you&apos;re buying without surprise fees at checkout.
             </p>
             <p className="about-lead">
-              We&apos;re run by {COMPANY.name} out of Surat, and our team is small on purpose. It lets us actually look
-              at what we&apos;re listing instead of just uploading a catalogue feed and hoping for the best.
+              Run by {COMPANY.name} out of Surat. We stay small on purpose so every listing gets a real look before it
+              goes live.
             </p>
             <Link href="/shop" className="btn btn-accent about-cta">
-              Explore Our Collection →
+              Explore the collection →
             </Link>
           </div>
-          <div className="about-media">
-            <img src={HERO_IMG} alt="Xellbuy beauty edit" />
+
+          <div className="about-mosaic" aria-hidden={false}>
+            <div className="about-mosaic-main">
+              <img src={heroMain} alt={products[0]?.name || "Xellbuy dress"} />
+            </div>
+            <div className="about-mosaic-side">
+              {heroSide.map((src, i) => (
+                <div key={i} className="about-mosaic-tile">
+                  <img src={src} alt="" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="about-who">
-        <div className="container about-split reverse">
-          <div className="about-media">
-            <img src={WHO_IMG} alt="Xellbuy beauty products" />
+      <section className="about-who about-who--fashion">
+        <div className="container about-who-grid">
+          <div className="about-who-visual">
+            <img src={pickImage} alt="How we pick styles for Xellbuy" />
+            <div className="about-who-caption">
+              <span>From Surat</span>
+              <strong>Listed with clear ₹ pricing</strong>
+            </div>
           </div>
           <div className="about-copy">
             <p className="about-eyebrow teal">How we pick</p>
             <h2>What goes on the site — and what doesn&apos;t.</h2>
             <p>
-              Every product goes through a basic filter before it&apos;s listed: is the description honest, is the
-              packaging something we&apos;d trust with our own skin, and is the price fair once you compare it against
-              what&apos;s actually inside the bottle. We&apos;re not chasing every new launch — we&apos;d rather have
-              fewer products we stand behind than a catalogue padded with filler.
+              Every style goes through a basic filter: honest description, wearable silhouette, and a fair ₹ price
+              against what you actually get. Fewer pieces we stand behind beats a catalogue padded with filler.
             </p>
             <p>
-              Prices are shown clearly in ₹ with no hidden add-ons at checkout. You can pay via Cash on Delivery if you
-              want to see the product before paying, or complete a quick, secure online payment if you&apos;d rather
-              finish in one step. Either way, support is a real conversation — not a bot loop — whenever something needs
-              sorting.
+              Pay via Cash on Delivery if you want to see the piece first, or complete a secure online payment in one
+              step. Support is a real conversation when something needs sorting.
             </p>
+            <ul className="about-checklist">
+              <li>Clear product photos &amp; descriptions</li>
+              <li>INR prices with no hidden checkout add-ons</li>
+              <li>COD and online payment across India</li>
+            </ul>
           </div>
         </div>
       </section>
 
-      <section className="about-offer">
+      <section className="about-offer about-offer--fashion">
         <div className="container">
           <div className="about-center-head">
-            <p className="about-eyebrow teal">Our categories</p>
-            <h2>Four categories, and why they exist</h2>
-            <p className="about-sub">
-              A tighter selection of everyday essentials — chosen for real routines, not noise.
-            </p>
+            <p className="about-eyebrow teal">Shop by edit</p>
+            <h2>A tighter edit of women&apos;s wear</h2>
+            <p className="about-sub">Real styles from our catalogue — not stock illustrations.</p>
           </div>
-          <div className="about-offer-grid">
-            {categoryBlocks.map((item) => (
-              <article key={item.title} className="about-offer-card">
-                <div className="about-offer-icon" aria-hidden>
-                  {item.icon}
+          <div className="about-cat-grid">
+            {categoryCopy.map((item) => (
+              <Link key={item.key} href={item.href} className="about-cat-card">
+                <div className="about-cat-media">
+                  <img src={byCategory(item.key)} alt="" />
                 </div>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-              </article>
+                <div className="about-cat-body">
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                  <span>Shop {item.title.split(" ")[0]} →</span>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="about-mission">
-        <div className="container about-mission-inner">
-          <p className="about-eyebrow gold">Our aim</p>
-          <h2>A beauty store that treats your routine seriously — without making it complicated.</h2>
-          <p>
-            If you&apos;re looking for honest listings, clear INR pricing, and products we&apos;d stand behind, that&apos;s
-            what we&apos;re aiming to be — from discovery on Xellbuy to delivery at your doorstep across India.
-          </p>
+      <section className="about-strip">
+        <div className="container about-strip-row">
+          {products.slice(0, 6).map((p) => (
+            <Link key={p.id} href={`/product/${p.id}`} className="about-strip-item" title={p.name}>
+              <img src={p.image} alt={p.name} />
+            </Link>
+          ))}
         </div>
       </section>
 
-      <section className="about-bottom-cta">
-        <div className="container">
-          <div className="about-cta-banner">
-            <h2>Find your everyday essential</h2>
-            <p>Explore our collection and discover products that fit your skin, hair and everyday routine.</p>
-            <Link href="/shop" className="btn about-cta-btn">
-              Shop Now →
-            </Link>
-          </div>
+      <section className="about-mission about-mission--fashion">
+        <div className="container about-mission-inner">
+          <p className="about-eyebrow teal">Our aim</p>
+          <h2>Fashion discovery without the noise.</h2>
+          <p>
+            Honest listings, clear INR pricing, and styles we&apos;d stand behind — from discovery on Xellbuy to
+            delivery at your doorstep across India.
+          </p>
+          <Link href="/shop" className="btn btn-accent about-cta">
+            Shop now →
+          </Link>
         </div>
       </section>
 
