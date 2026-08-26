@@ -10,7 +10,7 @@ export function StarRatingDisplay({
   size?: number;
 }) {
   if (!rating && !count) {
-    return <span className="star-rating star-rating--empty">No reviews yet</span>;
+    return null;
   }
   return (
     <span className="star-rating" aria-label={`Rated ${rating} out of 5`}>

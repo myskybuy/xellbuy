@@ -131,9 +131,11 @@ export default function ProductPage() {
         <div className="product-info">
           <span className="brand">{product.brand}</span>
           <h1>{product.name}</h1>
-          <a href="#reviews" className="product-rating-link">
-            <StarRatingDisplay rating={ratingSummary.avgRating} count={ratingSummary.reviewCount} size={16} />
-          </a>
+          {ratingSummary.reviewCount > 0 ? (
+            <a href="#reviews" className="product-rating-link">
+              <StarRatingDisplay rating={ratingSummary.avgRating} count={ratingSummary.reviewCount} size={16} />
+            </a>
+          ) : null}
           <div className="price-row">
             <span className="price-now">₹{product.salePrice}</span>
             {product.price > product.salePrice ? <span className="price-old">₹{product.price}</span> : null}
@@ -180,10 +182,11 @@ export default function ProductPage() {
           <div className="section-head">
             <div>
               <div className="eyebrow">Customer reviews</div>
-              <h2>
-                <StarRatingDisplay rating={ratingSummary.avgRating} count={ratingSummary.reviewCount} size={22} />
-              </h2>
+              <h2>{ratingSummary.reviewCount > 0 ? "What customers say" : "Be the first to review"}</h2>
             </div>
+            {ratingSummary.reviewCount > 0 ? (
+              <StarRatingDisplay rating={ratingSummary.avgRating} count={ratingSummary.reviewCount} size={22} />
+            ) : null}
           </div>
 
           <div className="review-form">
