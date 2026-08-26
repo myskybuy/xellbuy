@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/components/AuthProvider";
 import { CartProvider } from "@/components/CartProvider";
+import { WishlistProvider } from "@/components/WishlistProvider";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -29,10 +30,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <AuthProvider>
-          <CartProvider>
-            {children}
-            <Toaster richColors position="top-center" closeButton />
-          </CartProvider>
+          <WishlistProvider>
+            <CartProvider>
+              {children}
+              <Toaster richColors position="top-center" closeButton />
+            </CartProvider>
+          </WishlistProvider>
         </AuthProvider>
       </body>
     </html>

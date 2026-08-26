@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "./db";
+import { getRatingSummaries } from "./reviews";
 
 export type ProductFilters = {
   category?: string;
@@ -31,11 +32,23 @@ export async function listProducts(filters: ProductFilters = {}) {
     products = products.filter((p) => p.salePrice < p.price);
   }
 
-  return products;
+  const ratings = await getRatingSummaries(products.map((p) => p.id));
+  return products.map((p) => ({
+    ...p,
+    avgRating: ratings.get(p.id)?.avgRating || 0,
+    reviewCount: ratings.get(p.id)?.reviewCount || 0,
+  }));
 }
 
 export async function getProduct(id: number) {
-  return prisma.product.findUnique({ where: { id } });
+  const product = await prisma.product.findUnique({ where: { id } });
+  if (!product) return null;
+  const ratings = await getRatingSummaries([id]);
+  return {
+    ...product,
+    avgRating: ratings.get(id)?.avgRating || 0,
+    reviewCount: ratings.get(id)?.reviewCount || 0,
+  };
 }
 
 export async function getBanner() {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { useAuth } from "./AuthProvider";
 import { useCart } from "./CartProvider";
+import { useWishlist } from "./WishlistProvider";
 
 const NAV = [
   { href: "/shop?category=Dresses", label: "Dresses" },
@@ -19,6 +20,7 @@ const NAV = [
 export default function SiteHeader({ showSearch = true }: { showSearch?: boolean }) {
   const router = useRouter();
   const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
   const { user } = useAuth();
   const [query, setQuery] = useState("");
   const [navOpen, setNavOpen] = useState(false);
@@ -73,6 +75,13 @@ export default function SiteHeader({ showSearch = true }: { showSearch?: boolean
               <path d="M5 19.5c0-3.4 3.1-6 7-6s7 2.6 7 6" />
             </svg>
             <span className="header-icon-label">{user ? user.name.split(" ")[0] : "Account"}</span>
+          </Link>
+
+          <Link href="/wishlist" className="header-icon-btn wishlist-icon-btn" aria-label={`Wishlist, ${wishlistCount} items`}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+              <path d="M12 20.5s-7.5-4.6-10-9.3C.4 7.7 2.2 4 5.9 4c2.1 0 3.7 1.1 4.6 2.6C11.4 5.1 13 4 15.1 4c3.7 0 5.5 3.7 3.9 7.2-2.5 4.7-10 9.3-10 9.3z" />
+            </svg>
+            {wishlistCount > 0 ? <span className="cart-badge">{wishlistCount > 99 ? "99+" : wishlistCount}</span> : null}
           </Link>
 
           <Link href="/cart" className="header-icon-btn cart-icon-btn" aria-label={`Cart, ${cartCount} items`}>

@@ -7,8 +7,87 @@ import ProductCard, { Product } from "@/components/ProductCard";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import StoreShell from "@/components/StoreShell";
+import { StarRatingDisplay } from "@/components/StarRating";
 
 const heroAllowedCategories = ["Dresses", "Tops", "Jeans", "Sarees", "Ethnic Wear", "Blouses", "Skirts"];
+
+const USPS = [
+  {
+    title: "Cash on delivery",
+    desc: "Pay when it arrives, anywhere in India",
+    icon: (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+        <rect x="2" y="6" width="20" height="13" rx="2" />
+        <circle cx="12" cy="12.5" r="3" />
+        <path d="M6 6V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1" />
+      </svg>
+    ),
+  },
+  {
+    title: "Easy 7-day returns",
+    desc: "Changed your mind? Send it back, no fuss",
+    icon: (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+        <path d="M3 12a9 9 0 1 0 3-6.7" />
+        <path d="M3 4v5h5" />
+      </svg>
+    ),
+  },
+  {
+    title: "Quality checked",
+    desc: "Every piece inspected before it ships",
+    icon: (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+        <path d="M9 12l2 2 4-4" />
+        <circle cx="12" cy="12" r="9" />
+      </svg>
+    ),
+  },
+  {
+    title: "Pan-India shipping",
+    desc: "Delivered fast to your doorstep",
+    icon: (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+        <path d="M3 7h11v10H3z" />
+        <path d="M14 10h4l3 3v4h-7z" />
+        <circle cx="7.5" cy="19" r="1.6" />
+        <circle cx="17.5" cy="19" r="1.6" />
+      </svg>
+    ),
+  },
+];
+
+const PROMO_TILES = [
+  {
+    kicker: "New in",
+    title: "Festive Ethnic Edit",
+    cta: "Shop ethnic wear",
+    href: "/shop?category=Ethnic%20Wear",
+    className: "promo-tile--teal",
+  },
+  {
+    kicker: "Trending",
+    title: "Denim, done right",
+    cta: "Shop jeans",
+    href: "/shop?category=Jeans",
+    className: "promo-tile--slate",
+  },
+  {
+    kicker: "Best value",
+    title: "Price drops up to 50%",
+    cta: "Shop the sale",
+    href: "/shop?sale=1",
+    className: "promo-tile--rose",
+  },
+];
+
+type RecentReview = {
+  id: number;
+  rating: number;
+  comment: string;
+  userName: string;
+  product: { id: number; name: string; image: string };
+};
 
 export default function HomePage() {
   const [categories, setCategories] = useState<Array<{ id: number; name: string; image: string }>>([]);
@@ -16,6 +95,7 @@ export default function HomePage() {
   const [heroProducts, setHeroProducts] = useState<Product[]>([]);
   const [heroIndex, setHeroIndex] = useState(0);
   const [heroPaused, setHeroPaused] = useState(false);
+  const [recentReviews, setRecentReviews] = useState<RecentReview[]>([]);
 
   useEffect(() => {
     fetch("/api/categories")
@@ -29,6 +109,10 @@ export default function HomePage() {
         const preferred = withImage.filter((p) => heroAllowedCategories.includes(p.category));
         setHeroProducts((preferred.length ? preferred : withImage).slice(0, 8));
       });
+    fetch("/api/reviews/recent?limit=6")
+      .then((r) => r.json())
+      .then(setRecentReviews)
+      .catch(() => setRecentReviews([]));
   }, []);
 
   useEffect(() => {
@@ -149,6 +233,22 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="usp-strip">
+          <div className="container usp-strip-inner">
+            {USPS.map((u) => (
+              <div className="usp-item" key={u.title}>
+                <span className="usp-icon" aria-hidden>
+                  {u.icon}
+                </span>
+                <div>
+                  <strong>{u.title}</strong>
+                  <span>{u.desc}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section className="section">
           <div className="container">
             <div className="section-head">
@@ -173,8 +273,25 @@ export default function HomePage() {
                       </span>
                     )}
                     <span className="cc-shade" aria-hidden />
-                    <span className="cc-label">{c.name}</span>
+                    <span className="cc-label">
+                      {c.name}
+                      <span className="cc-arrow" aria-hidden>→</span>
+                    </span>
                   </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section" style={{ paddingTop: 0 }}>
+          <div className="container">
+            <div className="promo-grid">
+              {PROMO_TILES.map((tile) => (
+                <Link key={tile.title} href={tile.href} className={`promo-tile ${tile.className}`}>
+                  <span className="promo-tile-kicker">{tile.kicker}</span>
+                  <span className="promo-tile-title">{tile.title}</span>
+                  <span className="promo-tile-cta">{tile.cta} →</span>
                 </Link>
               ))}
             </div>
@@ -193,6 +310,56 @@ export default function HomePage() {
             <div className="product-grid">{products.slice(0, 8).map((p) => <ProductCard key={p.id} product={p} />)}</div>
           </div>
         </section>
+
+        {products.length > 8 ? (
+          <section className="section" style={{ paddingTop: 0 }}>
+            <div className="container">
+              <div className="section-head">
+                <div>
+                  <div className="eyebrow">Just landed</div>
+                  <h2>New arrivals</h2>
+                </div>
+                <Link href="/shop">View all →</Link>
+              </div>
+              <div className="product-grid">
+                {[...products]
+                  .reverse()
+                  .slice(0, 8)
+                  .map((p) => (
+                    <ProductCard key={p.id} product={p} />
+                  ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {recentReviews.length ? (
+          <section className="section testimonial-section" style={{ paddingTop: 0 }}>
+            <div className="container">
+              <div className="section-head">
+                <div>
+                  <div className="eyebrow">Loved by customers</div>
+                  <h2>What shoppers are saying</h2>
+                </div>
+              </div>
+              <div className="testimonial-grid">
+                {recentReviews.map((r) => (
+                  <div className="testimonial-card" key={r.id}>
+                    <StarRatingDisplay rating={r.rating} />
+                    <p className="testimonial-comment">&ldquo;{r.comment}&rdquo;</p>
+                    <div className="testimonial-meta">
+                      <img src={r.product.image} alt="" className="testimonial-product-img" />
+                      <div>
+                        <strong>{r.userName}</strong>
+                        <Link href={`/product/${r.product.id}`}>{r.product.name}</Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         <div className="cta-band">
           <div className="eyebrow">Explore the catalogue</div>

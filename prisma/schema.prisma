@@ -14,7 +14,7 @@ model Category {
 }
 
 model Product {
-  id          Int    @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   name        String
   category    String
   brand       String
@@ -22,7 +22,9 @@ model Product {
   salePrice   Int
   image       String
   stock       Int
-  description String @db.Text
+  description String     @db.Text
+  wishlists   Wishlist[]
+  reviews     Review[]
 }
 
 model Coupon {
@@ -54,6 +56,34 @@ model User {
   passwordHash String
   createdAt    DateTime @default(now())
   orders       Order[]
+  wishlists    Wishlist[]
+  reviews      Review[]
+}
+
+model Wishlist {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String   @default("") @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@index([productId])
 }
 
 model OtpCode {

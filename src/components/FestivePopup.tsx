@@ -42,9 +42,11 @@ export default function FestivePopup() {
         <button type="button" className="promo-popup-close" onClick={dismiss} aria-label="Close">
           ×
         </button>
-        <div className="promo-popup-media">
-          <img src={banner.image} alt="" />
-        </div>
+        {banner.image ? (
+          <div className="promo-popup-media">
+            <img src={banner.image} alt="" />
+          </div>
+        ) : null}
         <div className="promo-popup-body">
           <p className="promo-popup-kicker">Xellbuy offer</p>
           <h3>{banner.title}</h3>
