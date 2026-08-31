@@ -46,17 +46,18 @@ export default function CartPage() {
         ) : (
           <>
             {cart.map((item) => (
-              <div key={item.id} className="cart-item">
+              <div key={`${item.id}-${item.size || ""}`} className="cart-item">
                 <img src={item.image} alt={item.name} />
                 <div className="cart-item-info">
                   <strong>{item.name}</strong>
+                  {item.size ? <span className="cart-item-size">Size: {item.size}</span> : null}
                   <div>₹{item.salePrice}</div>
                   <div className="qty-controls">
-                    <button type="button" onClick={() => updateQty(item.id, item.qty - 1)}>
+                    <button type="button" onClick={() => updateQty(item.id, item.qty - 1, item.size)}>
                       -
                     </button>
                     <span>{item.qty}</span>
-                    <button type="button" onClick={() => updateQty(item.id, item.qty + 1)}>
+                    <button type="button" onClick={() => updateQty(item.id, item.qty + 1, item.size)}>
                       +
                     </button>
                   </div>
@@ -67,7 +68,7 @@ export default function CartPage() {
                     type="button"
                     className="remove-btn"
                     onClick={() => {
-                      removeFromCart(item.id);
+                      removeFromCart(item.id, item.size);
                       toast.success("Removed from cart");
                     }}
                   >

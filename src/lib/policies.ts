@@ -1,5 +1,5 @@
 export const COMPANY = {
-  name: "SKYBUY PRIVATE LIMITED",
+  name: "JAXELL PRIVATE LIMITED",
   brand: "Xellbuy",
   address:
     "2ND FLOOR,Building No./Flat No.: 208,RANGILA PAR,Surat,Gujarat-394101",

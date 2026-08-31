@@ -17,6 +17,8 @@ export type Product = {
   image: string;
   stock: number;
   description: string;
+  careInfo?: string;
+  occasion?: string;
   avgRating?: number;
   reviewCount?: number;
 };

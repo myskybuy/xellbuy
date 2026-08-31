@@ -11,6 +11,8 @@ import { useCart } from "@/components/CartProvider";
 import { useWishlist } from "@/components/WishlistProvider";
 import { useAuth } from "@/components/AuthProvider";
 import { StarRatingDisplay, StarRatingInput } from "@/components/StarRating";
+import SizeGuide from "@/components/SizeGuide";
+import { SIZES, getSizeGuide } from "@/lib/sizeGuide";
 import { toast } from "sonner";
 
 type Review = {
@@ -32,6 +34,7 @@ export default function ProductPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [qty, setQty] = useState(1);
   const [feedback, setFeedback] = useState<"idle" | "added">("idle");
+  const [size, setSize] = useState<string | null>(null);
 
   const [reviews, setReviews] = useState<Review[]>([]);
   const [ratingSummary, setRatingSummary] = useState({ avgRating: 0, reviewCount: 0 });
@@ -115,7 +118,9 @@ export default function ProductPage() {
   }
 
   const discount = product.price > 0 ? Math.round(((product.price - product.salePrice) / product.price) * 100) : 0;
-  const inCart = isInCart(product.id);
+  const sizeInfo = getSizeGuide(product.category);
+  const needsSize = !!sizeInfo && sizeInfo.kind !== "freesize";
+  const inCart = isInCart(product.id, size || undefined);
   const wishlisted = isWishlisted(product.id);
   const btnLabel = feedback === "added" ? "Item added to cart" : inCart ? "In cart" : "Add to cart";
   const myExistingReview = reviews.find((r) => r.isMine);
@@ -136,11 +141,36 @@ export default function ProductPage() {
               <StarRatingDisplay rating={ratingSummary.avgRating} count={ratingSummary.reviewCount} size={16} />
             </a>
           ) : null}
+          {product.occasion ? <span className="occasion-tag">{product.occasion}</span> : null}
           <div className="price-row">
             <span className="price-now">₹{product.salePrice}</span>
             {product.price > product.salePrice ? <span className="price-old">₹{product.price}</span> : null}
           </div>
           <p className="product-desc">{product.description}</p>
+          {product.careInfo ? (
+            <details className="size-guide">
+              <summary>Fabric &amp; care</summary>
+              <p className="size-guide-note">{product.careInfo}</p>
+            </details>
+          ) : null}
+          {needsSize ? (
+            <div className="size-row">
+              <label>Size</label>
+              <div className="size-chips">
+                {SIZES.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    className={`size-chip ${size === s ? "active" : ""}`}
+                    onClick={() => setSize(s)}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          <SizeGuide category={product.category} />
           <div className="qty-row">
             <label>Quantity</label>
             <input type="number" min={1} value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value)))} />
@@ -150,8 +180,18 @@ export default function ProductPage() {
               className={`btn btn-accent ${feedback === "added" ? "added" : ""}`}
               type="button"
               onClick={() => {
+                if (needsSize && !size) {
+                  toast.error("Please select a size");
+                  return;
+                }
                 addToCart(
-                  { id: product.id, name: product.name, image: product.image, salePrice: product.salePrice },
+                  {
+                    id: product.id,
+                    name: product.name,
+                    image: product.image,
+                    salePrice: product.salePrice,
+                    size: size || undefined,
+                  },
                   qty
                 );
                 setFeedback("added");

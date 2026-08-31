@@ -23,6 +23,8 @@ model Product {
   image       String
   stock       Int
   description String     @db.Text
+  careInfo    String     @default("") @db.Text
+  occasion    String     @default("")
   wishlists   Wishlist[]
   reviews     Review[]
 }
