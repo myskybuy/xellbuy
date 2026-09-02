@@ -25,6 +25,7 @@ export default function SiteFooter() {
             <h4>Shop</h4>
             <Link href="/shop?category=Dresses">Dresses</Link>
             <Link href="/shop?category=Tops">Tops</Link>
+            <Link href="/shop?category=Blouses">Blouses</Link>
             <Link href="/shop?category=Jeans">Jeans</Link>
             <Link href="/shop?category=Sarees">Sarees</Link>
             <Link href="/shop?category=Ethnic%20Wear">Ethnic Wear</Link>

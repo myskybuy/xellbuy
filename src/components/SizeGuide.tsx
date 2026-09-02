@@ -4,16 +4,7 @@ import { getSizeGuide } from "@/lib/sizeGuide";
 
 export default function SizeGuide({ category }: { category: string }) {
   const guide = getSizeGuide(category);
-  if (!guide) return null;
-
-  if (guide.kind === "freesize") {
-    return (
-      <details className="size-guide">
-        <summary>Size &amp; fit info</summary>
-        <p className="size-guide-note">{guide.note}</p>
-      </details>
-    );
-  }
+  if (!guide || guide.kind === "freesize") return null;
 
   const isTop = guide.kind === "top";
 

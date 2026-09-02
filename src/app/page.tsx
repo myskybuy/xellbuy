@@ -322,12 +322,9 @@ export default function HomePage() {
                 <Link href="/shop">View all →</Link>
               </div>
               <div className="product-grid">
-                {[...products]
-                  .reverse()
-                  .slice(0, 8)
-                  .map((p) => (
-                    <ProductCard key={p.id} product={p} />
-                  ))}
+                {products.slice(8, 16).map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
               </div>
             </div>
           </section>

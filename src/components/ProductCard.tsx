@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useCart } from "./CartProvider";
 import { useWishlist } from "./WishlistProvider";
+import { getSizeLabel } from "@/lib/sizeGuide";
+import ProductImage from "./ProductImage";
 import { StarRatingDisplay } from "./StarRating";
 
 export type Product = {
@@ -56,7 +58,7 @@ export default function ProductCard({ product }: { product: Product }) {
       <Link href={`/product/${product.id}`} className="thumb">
         {discount > 0 ? <span className="badge-sale">-{discount}%</span> : null}
         {product.category ? <span className="badge-cat">{product.category}</span> : null}
-        <img src={product.image} alt={product.name} loading="lazy" />
+        <ProductImage src={product.image} alt={product.name} loading="lazy" />
       </Link>
       <button
         type="button"
@@ -72,10 +74,11 @@ export default function ProductCard({ product }: { product: Product }) {
         </svg>
       </button>
       <div className="info">
-        <span className="brand">{product.brand || "Xellbuy"}</span>
+        <span className="brand">Xellbuy</span>
         <Link href={`/product/${product.id}`} className="name-link">
           <h3 className="name">{product.name}</h3>
         </Link>
+        <span className="product-size-hint">{getSizeLabel(product.category)}</span>
         <StarRatingDisplay rating={product.avgRating || 0} count={product.reviewCount || 0} />
         <div className="product-card-footer">
           <div className="price-row">

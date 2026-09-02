@@ -10,6 +10,7 @@ import { useWishlist } from "./WishlistProvider";
 const NAV = [
   { href: "/shop?category=Dresses", label: "Dresses" },
   { href: "/shop?category=Tops", label: "Tops" },
+  { href: "/shop?category=Blouses", label: "Blouses" },
   { href: "/shop?category=Jeans", label: "Jeans" },
   { href: "/shop?category=Sarees", label: "Sarees" },
   { href: "/shop?category=Ethnic%20Wear", label: "Ethnic Wear" },

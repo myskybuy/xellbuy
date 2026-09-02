@@ -24,6 +24,12 @@ export type SizeGuide =
   | { kind: "bottom"; rows: typeof BOTTOM_CHART; fitNote: string }
   | { kind: "freesize"; note: string };
 
+export function getSizeLabel(category: string): string {
+  if (category === "Sarees") return "Free size";
+  if (category === "Ethnic Wear" || category === "Ethnic Sets") return "S–XL";
+  return "XS–XXL";
+}
+
 export function getSizeGuide(category: string): SizeGuide | null {
   switch (category) {
     case "Dresses":

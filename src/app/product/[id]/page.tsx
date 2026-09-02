@@ -11,6 +11,7 @@ import { useCart } from "@/components/CartProvider";
 import { useWishlist } from "@/components/WishlistProvider";
 import { useAuth } from "@/components/AuthProvider";
 import { StarRatingDisplay, StarRatingInput } from "@/components/StarRating";
+import ProductImage from "@/components/ProductImage";
 import SizeGuide from "@/components/SizeGuide";
 import { SIZES, getSizeGuide } from "@/lib/sizeGuide";
 import { toast } from "sonner";
@@ -131,10 +132,10 @@ export default function ProductPage() {
       <div className="product-page">
         <div className="product-gallery">
           {discount > 0 ? <span className="badge-sale">{discount}% OFF</span> : null}
-          <img src={product.image} alt={product.name} />
+          <ProductImage src={product.image} alt={product.name} />
         </div>
         <div className="product-info">
-          <span className="brand">{product.brand}</span>
+          <span className="brand">Xellbuy</span>
           <h1>{product.name}</h1>
           {ratingSummary.reviewCount > 0 ? (
             <a href="#reviews" className="product-rating-link">
@@ -146,7 +147,12 @@ export default function ProductPage() {
             <span className="price-now">₹{product.salePrice}</span>
             {product.price > product.salePrice ? <span className="price-old">₹{product.price}</span> : null}
           </div>
-          <p className="product-desc">{product.description}</p>
+          <div className="product-desc">
+            {product.description.split("\n\n").map((para, i) => (
+              <p key={i}>{para}</p>
+            ))}
+            {sizeInfo?.kind === "freesize" ? <p>{sizeInfo.note}</p> : null}
+          </div>
           {product.careInfo ? (
             <details className="size-guide">
               <summary>Fabric &amp; care</summary>
