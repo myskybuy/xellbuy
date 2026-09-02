@@ -147,12 +147,25 @@ export default function ProductPage() {
             <span className="price-now">₹{product.salePrice}</span>
             {product.price > product.salePrice ? <span className="price-old">₹{product.price}</span> : null}
           </div>
+          {product.highlights ? (
+            <ul className="product-highlights">
+              {product.highlights.split("\n").map((line, i) => (
+                <li key={i}>{line.replace(/^•\s*/, "")}</li>
+              ))}
+            </ul>
+          ) : null}
           <div className="product-desc">
             {product.description.split("\n\n").map((para, i) => (
               <p key={i}>{para}</p>
             ))}
             {sizeInfo?.kind === "freesize" ? <p>{sizeInfo.note}</p> : null}
           </div>
+          {product.whatsInBox ? (
+            <p className="whats-in-box">
+              <strong>Includes:</strong> {product.whatsInBox}
+            </p>
+          ) : null}
+          {product.stylingTip ? <p className="styling-tip">💡 {product.stylingTip}</p> : null}
           {product.careInfo ? (
             <details className="size-guide">
               <summary>Fabric &amp; care</summary>

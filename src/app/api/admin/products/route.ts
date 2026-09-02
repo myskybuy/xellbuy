@@ -23,6 +23,9 @@ export async function POST(req: NextRequest) {
       description: body.description || "",
       careInfo: body.careInfo || "",
       occasion: body.occasion || "",
+      highlights: body.highlights || "",
+      whatsInBox: body.whatsInBox || "",
+      stylingTip: body.stylingTip || "",
     },
   });
   return NextResponse.json({ success: true, product });

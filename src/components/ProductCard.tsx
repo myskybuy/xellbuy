@@ -21,6 +21,9 @@ export type Product = {
   description: string;
   careInfo?: string;
   occasion?: string;
+  highlights?: string;
+  whatsInBox?: string;
+  stylingTip?: string;
   avgRating?: number;
   reviewCount?: number;
 };

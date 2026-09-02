@@ -25,6 +25,9 @@ model Product {
   description String     @db.Text
   careInfo    String     @default("") @db.Text
   occasion    String     @default("")
+  highlights  String     @default("") @db.Text
+  whatsInBox  String     @default("") @db.Text
+  stylingTip  String     @default("") @db.Text
   wishlists   Wishlist[]
   reviews     Review[]
 }

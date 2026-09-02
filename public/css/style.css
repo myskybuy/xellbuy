@@ -2176,6 +2176,44 @@ footer.site-footer {
   margin-bottom: 10px;
 }
 
+.product-highlights {
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.product-highlights li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13.5px;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+.product-highlights li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+.whats-in-box {
+  font-size: 13.5px;
+  color: var(--color-muted);
+  margin: 4px 0 0;
+}
+.whats-in-box strong { color: var(--color-text); }
+.styling-tip {
+  font-size: 13px;
+  color: var(--color-muted);
+  font-style: italic;
+  background: var(--color-bg);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 10px 0 0;
+}
+
 /* ---------- Star rating ---------- */
 .star-rating { display: inline-flex; align-items: center; gap: 6px; }
 .star-rating--empty { font-size: 12.5px; color: var(--color-muted); }
